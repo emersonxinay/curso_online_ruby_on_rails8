@@ -20,6 +20,12 @@ Este proyecto es una plataforma de cursos en línea desarrollada con **Ruby on R
 - **Pruebas:** RSpec, FactoryBot, Capybara
 - **Pagos:** Stripe, PayPal
 
+## img demo:
+img inicio:
+<img src="app/assets/images/inicio.png">
+img cursos instructor:
+<img src="app/assets/images/dashboard_instructor.png">
+
 ## 📌 Instalación
 
 ### 1. Clonar el Repositorio
