@@ -1,0 +1,20 @@
+<div class="container mx-auto px-4 py-8">
+  <div class="flex justify-between items-center mb-8">
+    <h1 class="text-3xl font-bold">All Courses</h1>
+    <% if current_user&.instructor_or_admin? %>
+      <%= link_to "Create Course", new_course_path, 
+          class: "bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700" %>
+    <% end %>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <% @courses.each do |course| %>
+      <%= render 'course_card', course: course %>
+    <% end %>
+  </div>
+
+  <%# Add pagination if you're using kaminari %>
+  <div class="mt-8">
+    <%= paginate @courses %>
+  </div>
+</div>

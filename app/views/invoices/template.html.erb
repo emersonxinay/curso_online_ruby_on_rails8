@@ -1,0 +1,61 @@
+<div class="max-w-2xl mx-auto bg-white shadow-lg rounded-lg p-6 border border-gray-200">
+  <!-- Header -->
+  <div class="flex justify-between items-center border-b pb-4 mb-4">
+    <h1 class="text-2xl font-bold text-gray-800">🧾 FACTURA</h1>
+    <div class="text-right text-gray-600">
+      <p><strong># Factura:</strong> <%= payment.id %></p>
+      <p><strong>Fecha:</strong> <%= payment.created_at.strftime("%d de %B, %Y") %></p>
+    </div>
+  </div>
+
+  <!-- Addresses -->
+  <div class="grid grid-cols-2 gap-4 mb-6">
+    <div>
+      <h3 class="text-lg font-semibold text-gray-700">De:</h3>
+      <p class="text-gray-600">📍 Course Platform Inc.</p>
+      <p class="text-gray-600">123 Education Street</p>
+      <p class="text-gray-600">Learning City, LC 12345</p>
+      <p class="text-gray-600">📧 contact@courseplatform.com</p>
+    </div>
+
+    <div>
+      <h3 class="text-lg font-semibold text-gray-700">Facturado a:</h3>
+      <p class="text-gray-600">👤 <%= user.name %></p>
+      <p class="text-gray-600">📧 <%= user.email %></p>
+    </div>
+  </div>
+
+  <!-- Items Table -->
+  <div class="mb-6">
+    <table class="w-full border-collapse border border-gray-300">
+      <thead>
+        <tr class="bg-gray-100 text-gray-700">
+          <th class="p-2 text-left border border-gray-300">Descripción</th>
+          <th class="p-2 text-right border border-gray-300">Monto</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="border border-gray-300">
+          <td class="p-2 text-gray-700">
+            🎓 Curso: <%= course.title %><br>
+            <small class="text-gray-500">Tarifa de inscripción</small>
+          </td>
+          <td class="p-2 text-right font-semibold text-gray-800">$<%= '%.2f' % payment.amount %></td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr class="bg-gray-200">
+          <td class="p-2 text-right font-semibold border border-gray-300">Total</td>
+          <td class="p-2 text-right font-bold text-gray-900 border border-gray-300">$<%= '%.2f' % payment.amount %></td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+
+  <!-- Footer -->
+  <div class="text-gray-700 text-sm">
+    <p>💳 <strong>Método de pago:</strong> <%= payment.payment_method.titleize %></p>
+    <p>🔢 <strong>ID de Transacción:</strong> <%= payment.transaction_id %></p>
+    <p class="mt-4 text-center font-semibold text-green-600">✅ ¡Gracias por tu compra!</p>
+  </div>
+</div>

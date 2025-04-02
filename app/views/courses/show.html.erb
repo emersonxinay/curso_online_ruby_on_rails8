@@ -1,0 +1,62 @@
+<div class="container mx-auto px-4 py-8">
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <div class="lg:col-span-2">
+      <h1 class="text-4xl font-bold mb-4"><%= @course.title %></h1>
+      
+      <div class="mb-8">
+        <%= @course.description %>
+      </div>
+
+      <% if @enrolled || current_user == @course.instructor %>
+        <div class="space-y-6">
+          <% @sections.each do |section| %>
+            <div class="bg-white rounded-lg shadow p-6">
+              <h3 class="text-xl font-semibold mb-4"><%= section.title %></h3>
+              
+              <div class="space-y-2">
+                <% section.lessons.each do |lesson| %>
+                  <%= link_to course_section_lesson_path(@course, section, lesson), 
+                      class: "flex items-center justify-between p-3 hover:bg-gray-50 rounded" do %>
+                    <span><%= lesson.title %></span>
+                    <% if current_user.completed_lessons.exists?(lesson: lesson) %>
+                      <span class="text-green-500">✓</span>
+                    <% end %>
+                  <% end %>
+                <% end %>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+
+    <div class="lg:col-span-1">
+      <div class="bg-white rounded-lg shadow p-6 sticky top-4">
+        <% if @course.cover_image.attached? %>
+          <%= image_tag @course.cover_image, class: "w-full h-48 object-cover rounded mb-4" %>
+        <% end %>
+
+        <div class="text-3xl font-bold mb-4">$<%= @course.price %></div>
+
+        <% if @enrolled %>
+          <div class="bg-green-100 text-green-800 p-4 rounded mb-4">
+            You are enrolled in this course
+          </div>
+        <% elsif current_user != @course.instructor %>
+          <%= button_to "Enroll Now", course_enrollments_path(@course), 
+              class: "w-full bg-indigo-600 text-white py-3 rounded font-semibold hover:bg-indigo-700" %>
+        <% end %>
+
+        <div class="mt-6">
+          <h4 class="font-semibold mb-2">This course includes:</h4>
+          <ul class="space-y-2">
+            <li>• <%= @course.lessons.count %> lessons</li>
+            <li>• Full lifetime access</li>
+            <li>• Access on mobile and TV</li>
+            <li>• Certificate of completion</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

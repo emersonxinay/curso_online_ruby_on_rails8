@@ -1,25 +1,43 @@
-<%- if controller_name != 'sessions' %>
-  <%= link_to "Log in", new_session_path(resource_name) %><br />
-<% end %>
+<div class="bg-white shadow-md rounded-lg p-6 text-gray-700">
+  <h3 class="text-lg font-semibold text-center mb-4">Acceso Rápido</h3>
 
-<%- if devise_mapping.registerable? && controller_name != 'registrations' %>
-  <%= link_to "Sign up", new_registration_path(resource_name) %><br />
-<% end %>
+  <div class="space-y-3">
+    <% if controller_name != 'sessions' %>
+      <%= link_to new_session_path(resource_name), class: "block px-4 py-2 bg-blue-500 text-white rounded-lg text-center hover:bg-blue-600 transition" do %>
+        🔐 Iniciar Sesión
+      <% end %>
+    <% end %>
 
-<%- if devise_mapping.recoverable? && controller_name != 'passwords' && controller_name != 'registrations' %>
-  <%= link_to "Forgot your password?", new_password_path(resource_name) %><br />
-<% end %>
+    <% if devise_mapping.registerable? && controller_name != 'registrations' %>
+      <%= link_to new_registration_path(resource_name), class: "block px-4 py-2 bg-green-500 text-white rounded-lg text-center hover:bg-green-600 transition" do %>
+        ✨ Registrarse
+      <% end %>
+    <% end %>
 
-<%- if devise_mapping.confirmable? && controller_name != 'confirmations' %>
-  <%= link_to "Didn't receive confirmation instructions?", new_confirmation_path(resource_name) %><br />
-<% end %>
+    <% if devise_mapping.recoverable? && controller_name != 'passwords' && controller_name != 'registrations' %>
+      <%= link_to new_password_path(resource_name), class: "block px-4 py-2 bg-yellow-500 text-white rounded-lg text-center hover:bg-yellow-600 transition" do %>
+        ❓ ¿Olvidaste tu contraseña?
+      <% end %>
+    <% end %>
 
-<%- if devise_mapping.lockable? && resource_class.unlock_strategy_enabled?(:email) && controller_name != 'unlocks' %>
-  <%= link_to "Didn't receive unlock instructions?", new_unlock_path(resource_name) %><br />
-<% end %>
+    <% if devise_mapping.confirmable? && controller_name != 'confirmations' %>
+      <%= link_to new_confirmation_path(resource_name), class: "block px-4 py-2 bg-purple-500 text-white rounded-lg text-center hover:bg-purple-600 transition" do %>
+        📩 Reenviar confirmación
+      <% end %>
+    <% end %>
 
-<%- if devise_mapping.omniauthable? %>
-  <%- resource_class.omniauth_providers.each do |provider| %>
-    <%= button_to "Sign in with #{OmniAuth::Utils.camelize(provider)}", omniauth_authorize_path(resource_name, provider), data: { turbo: false } %><br />
-  <% end %>
-<% end %>
+    <% if devise_mapping.lockable? && resource_class.unlock_strategy_enabled?(:email) && controller_name != 'unlocks' %>
+      <%= link_to new_unlock_path(resource_name), class: "block px-4 py-2 bg-red-500 text-white rounded-lg text-center hover:bg-red-600 transition" do %>
+        🔓 Reenviar instrucciones de desbloqueo
+      <% end %>
+    <% end %>
+
+    <% if devise_mapping.omniauthable? %>
+      <% resource_class.omniauth_providers.each do |provider| %>
+        <%= button_to omniauth_authorize_path(resource_name, provider), data: { turbo: false }, class: "block px-4 py-2 bg-gray-500 text-white rounded-lg text-center hover:bg-gray-600 transition" do %>
+          🔗 Iniciar sesión con <%= OmniAuth::Utils.camelize(provider) %>
+        <% end %>
+      <% end %>
+    <% end %>
+  </div>
+</div>

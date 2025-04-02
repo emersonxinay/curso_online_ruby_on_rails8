@@ -1,26 +1,81 @@
-<h2>Log in</h2>
+<div class="min-h-full flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-md w-full space-y-8 bg-white p-8 rounded-xl shadow-2xl transform transition-all hover:scale-105">
+    <div>
+      <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900 group">
+        <span class="bg-clip-text text-transparent bg-gradient-to-r from-indigo-500 to-blue-500">Iniciar sesión</span>
+      </h2>
+      <p class="mt-2 text-center text-sm text-gray-600">
+        Accede a tu cuenta para continuar aprendiendo
+      </p>
+    </div>
 
-<%= form_for(resource, as: resource_name, url: session_path(resource_name)) do |f| %>
-  <div class="field">
-    <%= f.label :email %><br />
-    <%= f.email_field :email, autofocus: true, autocomplete: "email" %>
-  </div>
+    <%= form_for(resource, as: resource_name, url: session_path(resource_name), html: { class: "mt-8 space-y-6" }) do |f| %>
+      <div class="rounded-md shadow-sm -space-y-px">
+        <div class="group">
+          <%= f.label :email, "Correo electrónico", class: "block text-sm font-medium text-gray-700 mb-1" %>
+          <%= f.email_field :email, autofocus: true, autocomplete: "email", 
+              class: "appearance-none relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm transition-colors duration-200 ease-in-out",
+              placeholder: "tu@email.com" %>
+        </div>
 
-  <div class="field">
-    <%= f.label :password %><br />
-    <%= f.password_field :password, autocomplete: "current-password" %>
-  </div>
+        <div class="group mt-4">
+          <%= f.label :password, "Contraseña", class: "block text-sm font-medium text-gray-700 mb-1" %>
+          <div class="relative">
+            <%= f.password_field :password, autocomplete: "current-password",
+                class: "appearance-none relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm transition-colors duration-200 ease-in-out",
+                placeholder: "••••••••" %>
+          </div>
+        </div>
+      </div>
 
   <% if devise_mapping.rememberable? %>
-    <div class="field">
-      <%= f.check_box :remember_me %>
-      <%= f.label :remember_me %>
-    </div>
-  <% end %>
+         <div class="flex items-center justify-between mt-4">
+           <div class="flex items-center">
+             <%= f.check_box :remember_me, 
+                 class: "h-5 w-5 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded transition duration-150 ease-in-out cursor-pointer" %>
+             <%= f.label :remember_me, "Recordar sesión", 
+                 class: "ml-2 block text-sm text-gray-900 select-none cursor-pointer hover:text-indigo-600 transition-colors duration-200" %>
+           </div>
+           <%= link_to "¿Olvidaste tu contraseña?", new_password_path(resource_name), 
+               class: "text-sm font-medium text-indigo-600 hover:text-indigo-500 transition-colors duration-200" %>
+         </div>
+       <% end %>
 
-  <div class="actions">
-    <%= f.submit "Log in" %>
-  </div>
-<% end %>
+       <div class="mt-6">
+         <%= f.submit "Iniciar sesión", 
+             class: "group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transform transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-xl" %>
+       </div>
+     <% end %>
 
-<%= render "devise/shared/links" %>
+     <div class="mt-6">
+       <div class="relative">
+         <div class="absolute inset-0 flex items-center">
+           <div class="w-full border-t border-gray-300"></div>
+         </div>
+         <div class="relative flex justify-center text-sm">
+           <span class="px-2 bg-white text-gray-500">O continúa con</span>
+         </div>
+       </div>
+
+       <div class="mt-6 grid grid-cols-2 gap-3">
+         <a href="#" class="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 transition-colors duration-200">
+           <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+             <path d="M12.545,10.239v3.821h5.445c-0.712,2.315-2.647,3.972-5.445,3.972c-3.332,0-6.033-2.701-6.033-6.032s2.701-6.032,6.033-6.032c1.498,0,2.866,0.549,3.921,1.453l2.814-2.814C17.503,2.988,15.139,2,12.545,2C7.021,2,2.543,6.477,2.543,12s4.478,10,10.002,10c8.396,0,10.249-7.85,9.426-11.748L12.545,10.239z"/>
+           </svg>
+         </a>
+
+         <a href="#" class="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 transition-colors duration-200">
+           <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+             <path d="M13.397,20.997v-8.196h2.765l0.411-3.209h-3.176V7.548c0-0.926,0.258-1.56,1.587-1.56h1.684V3.127C15.849,3.039,15.025,2.997,14.201,3c-2.444,0-4.122,1.492-4.122,4.231v2.355H7.332v3.209h2.753v8.202H13.397z"/>
+           </svg>
+         </a>
+       </div>
+     </div>
+
+     <div class="mt-6 text-center text-sm">
+       <span class="text-gray-600">¿No tienes una cuenta?</span>
+       <%= link_to "Regístrate ahora", new_registration_path(resource_name), 
+           class: "font-medium text-indigo-600 hover:text-indigo-500 transition-colors duration-200" %>
+     </div>
+   </div>
+ </div>

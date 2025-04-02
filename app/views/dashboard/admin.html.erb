@@ -1,0 +1,52 @@
+<div class="container mx-auto px-4 py-8">
+  <h1 class="text-3xl font-bold text-gray-900 mb-8">Admin Dashboard</h1>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+    <!-- Total Users Card -->
+    <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-xl transition-shadow duration-300">
+      <h3 class="text-xl font-semibold mb-2 text-gray-700">Total Users</h3>
+      <p class="text-3xl font-bold text-indigo-600"><%= @total_users %></p>
+    </div>
+
+    <!-- Total Courses Card -->
+    <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-xl transition-shadow duration-300">
+      <h3 class="text-xl font-semibold mb-2 text-gray-700">Total Courses</h3>
+      <p class="text-3xl font-bold text-indigo-600"><%= @total_courses %></p>
+    </div>
+
+    <!-- Total Enrollments Card -->
+    <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-xl transition-shadow duration-300">
+      <h3 class="text-xl font-semibold mb-2 text-gray-700">Total Enrollments</h3>
+      <p class="text-3xl font-bold text-indigo-600"><%= @total_enrollments %></p>
+    </div>
+  </div>
+
+  <!-- Recent Enrollments Table -->
+  <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-xl transition-shadow duration-300">
+    <h2 class="text-2xl font-semibold text-gray-700 mb-4">Recent Enrollments</h2>
+
+    <div class="overflow-x-auto rounded-lg">
+      <table class="min-w-full table-auto">
+        <thead>
+          <tr class="border-b">
+            <th class="text-left py-3 px-4 text-sm font-medium text-gray-600">Student</th>
+            <th class="text-left py-3 px-4 text-sm font-medium text-gray-600">Course</th>
+            <th class="text-left py-3 px-4 text-sm font-medium text-gray-600">Price</th>
+            <th class="text-left py-3 px-4 text-sm font-medium text-gray-600">Date</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <% @recent_enrollments.each do |enrollment| %>
+            <tr class="border-b hover:bg-gray-50">
+              <td class="py-3 px-4 text-sm text-gray-800"><%= enrollment.user.name %></td>
+              <td class="py-3 px-4 text-sm text-gray-800"><%= enrollment.course.title %></td>
+              <td class="py-3 px-4 text-sm text-gray-800">$<%= enrollment.price %></td>
+              <td class="py-3 px-4 text-sm text-gray-800"><%= enrollment.created_at.strftime("%B %d, %Y") %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

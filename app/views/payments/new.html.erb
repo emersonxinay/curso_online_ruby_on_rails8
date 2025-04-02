@@ -1,0 +1,45 @@
+<div class="container mx-auto px-4 py-8">
+  <div class="max-w-2xl mx-auto">
+    <h1 class="text-3xl font-bold mb-8">Choose Payment Method</h1>
+
+    <div class="bg-white rounded-lg shadow p-6">
+      <div class="mb-6">
+        <h2 class="text-xl font-semibold mb-2">Course Details</h2>
+        <p class="text-gray-600"><%= @enrollment.course.title %></p>
+        <p class="text-2xl font-bold text-indigo-600 mt-2">$<%= @enrollment.course.price %></p>
+      </div>
+
+      <%= form_with(model: [@enrollment, @payment], local: true, class: "space-y-6") do |f| %>
+        <div class="space-y-4">
+          <div class="flex items-center space-x-3">
+            <%= f.radio_button :payment_method, :stripe, class: "h-4 w-4 text-indigo-600" %>
+            <%= f.label :payment_method_stripe, class: "flex items-center" do %>
+              Credit Card
+              <%= image_tag "stripe.png", class: "h-8 ml-2" %>
+            <% end %>
+          </div>
+
+          <div class="flex items-center space-x-3">
+            <%= f.radio_button :payment_method, :paypal, class: "h-4 w-4 text-indigo-600" %>
+            <%= f.label :payment_method_paypal, class: "flex items-center" do %>
+              PayPal
+              <%= image_tag "paypal.png", class: "h-8 ml-2" %>
+            <% end %>
+          </div>
+
+          <div class="flex items-center space-x-3">
+            <%= f.radio_button :payment_method, :bank_transfer, class: "h-4 w-4 text-indigo-600" %>
+            <%= f.label :payment_method_bank_transfer, class: "flex items-center" do %>
+              Bank Transfer
+              <span class="text-sm text-gray-500 ml-2">(Manual verification required)</span>
+            <% end %>
+          </div>
+        </div>
+
+        <div class="mt-8">
+          <%= f.submit "Continue to Payment", class: "w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

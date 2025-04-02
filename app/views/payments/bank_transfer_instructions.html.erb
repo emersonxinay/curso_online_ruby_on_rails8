@@ -1,0 +1,52 @@
+<div class="container mx-auto px-4 py-8">
+  <div class="max-w-2xl mx-auto">
+    <h1 class="text-3xl font-bold mb-8">Instrucciones de Transferencia Bancaria</h1>
+
+    <div class="bg-white rounded-lg shadow p-6">
+      <div class="mb-8">
+        <h2 class="text-xl font-semibold mb-4">Detalles del Pago</h2>
+        <div class="space-y-3">
+          <div>
+            <span class="font-medium">Monto a Pagar:</span>
+            <span class="text-xl font-bold text-indigo-600"><%= number_to_currency(@payment.amount) %></span>
+          </div>
+          <div>
+            <span class="font-medium">Número de Referencia:</span>
+            <span class="font-mono bg-gray-100 px-2 py-1 rounded"><%= @payment.id %></span>
+          </div>
+          <div>
+            <span class="font-medium">Curso:</span>
+            <span class="text-gray-700"><%= @payment.enrollment.course.title %></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="border-t pt-6">
+        <h3 class="text-lg font-semibold mb-4">Información de la Cuenta Bancaria</h3>
+        <div class="space-y-3 text-gray-600">
+          <p><strong>Banco:</strong> <%= @bank_details[:bank_name] %></p>
+          <p><strong>Titular de la Cuenta:</strong> <%= @bank_details[:account_name] %></p>
+          <p><strong>Número de Cuenta:</strong> <%= @bank_details[:account_number] %></p>
+          <p><strong>Código SWIFT:</strong> <%= @bank_details[:swift_code] %></p>
+        </div>
+      </div>
+
+      <div class="mt-8 bg-yellow-50 border border-yellow-200 rounded p-4">
+        <h4 class="text-yellow-800 font-medium mb-2">Important Instructions</h4>
+        <ul class="list-disc list-inside text-yellow-700 space-y-2">
+          <li>Include your Reference Number in the transfer description</li>
+          <li>Keep your transfer receipt</li>
+          <li>Transfer must be made within 48 hours</li>
+          <li>After making the transfer, please email the receipt to support@example.com</li>
+        </ul>
+      </div>
+
+      <div class="mt-8 flex justify-between">
+        <%= link_to "Back to Course", course_path(@payment.enrollment.course), 
+            class: "text-gray-600 hover:text-gray-800" %>
+        <%= link_to "View My Enrollments", dashboard_student_path, 
+            class: "bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700" %>
+      </div>
+    </div>
+  </div>
+</div>

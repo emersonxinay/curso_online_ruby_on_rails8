@@ -1,30 +1,66 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <title><%= content_for(:title) || "App Cursos Linea" %></title>
-    <meta name="viewport" content="width=device-width,initial-scale=1">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="mobile-web-app-capable" content="yes">
-    <%= csrf_meta_tags %>
-    <%= csp_meta_tag %>
+<html class="h-full bg-gray-100" lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Cursos en Línea - Aprende a tu ritmo</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no">
+  <meta name="description" content="Plataforma de cursos en línea para aprender a tu propio ritmo con instructores expertos">
+  <meta name="theme-color" content="#4F46E5">
+  <%= csrf_meta_tags %>
+  <%= csp_meta_tag %>
 
-    <%= yield :head %>
+  <!-- Preload de recursos críticos -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-    <%# Enable PWA manifest for installable apps (make sure to enable in config/routes.rb too!) %>
-    <%#= tag.link rel: "manifest", href: pwa_manifest_path(format: :json) %>
+  <!-- Estilos -->
+  <%= stylesheet_link_tag "tailwind", "inter-font", "data-turbo-track": "reload" %>
+  <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
 
-    <link rel="icon" href="/icon.png" type="image/png">
-    <link rel="icon" href="/icon.svg" type="image/svg+xml">
-    <link rel="apple-touch-icon" href="/icon.png">
+  <!-- Scripts -->
+  <%= javascript_include_tag "application", defer: true %>
 
-    <%# Includes all stylesheet files in app/assets/stylesheets %>
-    <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
-    <%= javascript_importmap_tags %>
-  </head>
+  <!-- PWA -->
+  <link rel="manifest" href="/manifest.json">
+  <link rel="apple-touch-icon" href="/icon.png">
+</head>
 
-  <body>
-    <p class="notice"><%= notice %></p>
-    <p class="alert"><%= alert %></p>
-    <%= yield %>
-  </body>
+<body class="h-full antialiased">
+  <div class="min-h-screen flex flex-col bg-gradient-to-b from-gray-50 to-gray-100">
+    <%= render 'layouts/navbar' %>
+
+    <main class="flex-grow" role="main">
+      <div class="container mx-auto max-w-7xl py-6 px-4 sm:px-6 lg:px-8 transition-all duration-300 ease-in-out">
+        
+        <!-- Flash Messages -->
+        <div class="space-y-4" aria-live="polite">
+          <% if notice || alert %>
+            <div x-data="{ show: true }" x-show="show" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 transform -translate-y-2" x-transition:enter-end="opacity-100 transform translate-y-0" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 transform translate-y-0" x-transition:leave-end="opacity-0 transform -translate-y-2" class="relative rounded-lg p-4 shadow-lg backdrop-blur-sm bg-white/90 text-sm">
+              <div class="flex items-center space-x-3">
+                <% if notice %>
+                  <svg class="h-6 w-6 text-green-500 animate-bounce" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                  </svg>
+                  <p class="text-green-800 font-medium"><%= notice %></p>
+                <% elsif alert %>
+                  <svg class="h-6 w-6 text-red-500 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                  <p class="text-red-800 font-medium"><%= alert %></p>
+                <% end %>
+              </div>
+              <button @click="show = false" class="absolute top-2 right-2 text-gray-500 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 rounded-full p-1 transition-colors duration-200" aria-label="Cerrar notificación">
+                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+          <% end %>
+        </div>
+
+        <%= yield %>
+      </div>
+    </main>
+  </div>
+</body>
 </html>
