@@ -42,7 +42,7 @@ gem "tinymce-rails"
 
 # Payment processing
 gem "stripe", "~> 9.0"
-gem "pay", "~> 6.0"
+gem "pay", "~> 9.0"
 gem "paypal-sdk-rest"
 
 # UI Components
