@@ -41,7 +41,7 @@ gem "actiontext", require: "action_text"
 gem "tinymce-rails"
 
 # Payment processing
-gem "stripe", "~> 9.0"
+gem "stripe", "~> 14.0"
 gem "pay", "~> 6.0"
 gem "paypal-sdk-rest"
 
