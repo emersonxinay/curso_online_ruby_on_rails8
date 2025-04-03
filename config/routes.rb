@@ -4,6 +4,9 @@ Rails.application.routes.draw do
   devise_for :users
   
   resources :courses do
+    member do
+      get :setup
+    end
     resources :sections, except: [:index, :show] do
       resources :lessons, except: [:index] do
         member do

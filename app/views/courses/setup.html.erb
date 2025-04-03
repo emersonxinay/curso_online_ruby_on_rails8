@@ -1,0 +1,293 @@
+<div class="container mx-auto px-4 py-8">
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-2xl font-bold">Configuración del curso: <%= @course.title %></h1>
+    <%= link_to course_path(@course), class: "text-indigo-600 hover:text-indigo-800 flex items-center" do %>
+      <i class="fas fa-eye mr-2"></i> Ver curso
+    <% end %>
+  </div>
+
+  <!-- Barra de progreso de completitud del curso -->
+  <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+    <div class="flex justify-between items-center mb-2">
+      <h2 class="text-lg font-semibold">Progreso de configuración</h2>
+      <span class="text-sm font-medium <%= @completion_percentage >= 80 ? 'text-green-600' : 'text-amber-600' %>">
+        <%= @completion_percentage %>% completado
+      </span>
+    </div>
+    <div class="w-full bg-gray-200 rounded-full h-2.5 mb-4">
+      <div class="bg-indigo-600 h-2.5 rounded-full" style="width: <%= @completion_percentage %>%"></div>
+    </div>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+      <div class="flex items-center">
+        <div class="flex-shrink-0 h-8 w-8 rounded-full <%= @course.cover_image.attached? ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-400' %> flex items-center justify-center">
+          <i class="fas <%= @course.cover_image.attached? ? 'fa-check' : 'fa-image' %>"></i>
+        </div>
+        <div class="ml-3">
+          <p class="text-sm font-medium text-gray-700">Imagen de portada</p>
+          <% unless @course.cover_image.attached? %>
+            <%= link_to edit_course_path(@course), class: "text-xs text-indigo-600 hover:text-indigo-800" do %>
+              Añadir imagen
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+      
+      <div class="flex items-center">
+        <div class="flex-shrink-0 h-8 w-8 rounded-full <%= @course.description.present? && @course.description.to_plain_text.length > 100 ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-400' %> flex items-center justify-center">
+          <i class="fas <%= @course.description.present? && @course.description.to_plain_text.length > 100 ? 'fa-check' : 'fa-align-left' %>"></i>
+        </div>
+        <div class="ml-3">
+          <p class="text-sm font-medium text-gray-700">Descripción completa</p>
+          <% unless @course.description.present? && @course.description.to_plain_text.length > 100 %>
+            <%= link_to edit_course_path(@course), class: "text-xs text-indigo-600 hover:text-indigo-800" do %>
+              Mejorar descripción
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+      
+      <div class="flex items-center">
+        <div class="flex-shrink-0 h-8 w-8 rounded-full <%= @course.sections.exists? ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-400' %> flex items-center justify-center">
+          <i class="fas <%= @course.sections.exists? ? 'fa-check' : 'fa-list' %>"></i>
+        </div>
+        <div class="ml-3">
+          <p class="text-sm font-medium text-gray-700">Secciones (<%= @course.sections.count %>)</p>
+          <% unless @course.sections.count >= 2 %>
+            <span class="text-xs text-gray-500">Recomendado: al menos 2 secciones</span>
+          <% end %>
+        </div>
+      </div>
+      
+      <div class="flex items-center">
+        <div class="flex-shrink-0 h-8 w-8 rounded-full <%= @course.lessons.exists? ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-400' %> flex items-center justify-center">
+          <i class="fas <%= @course.lessons.exists? ? 'fa-check' : 'fa-video' %>"></i>
+        </div>
+        <div class="ml-3">
+          <p class="text-sm font-medium text-gray-700">Lecciones (<%= @course.lessons.count %>)</p>
+          <% unless @course.lessons.count >= 5 %>
+            <span class="text-xs text-gray-500">Recomendado: al menos 5 lecciones</span>
+          <% end %>
+        </div>
+      </div>
+    </div>
+    
+    <% if @completion_percentage >= 80 && @course.draft? %>
+      <div class="mt-6 text-center">
+        <%= button_to course_path(@course), method: :patch, params: { course: { status: 'published' } }, 
+            class: "inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700" do %>
+          <i class="fas fa-globe mr-2"></i> Publicar curso
+        <% end %>
+        <p class="text-xs text-gray-500 mt-2">Al publicar, tu curso estará disponible para todos los estudiantes</p>
+      </div>
+    <% elsif @course.published? %>
+      <div class="mt-6 text-center bg-green-50 p-4 rounded-lg">
+        <div class="flex items-center justify-center text-green-700">
+          <i class="fas fa-check-circle text-xl mr-2"></i>
+          <span class="font-medium">¡Tu curso ya está publicado!</span>
+        </div>
+        <p class="text-sm text-green-600 mt-1">Los estudiantes pueden inscribirse en tu curso</p>
+      </div>
+    <% end %>
+  </div>
+
+  <!-- Secciones y lecciones -->
+  <div class="bg-white rounded-lg shadow-md p-6">
+    <div class="flex justify-between items-center mb-6">
+      <h2 class="text-xl font-semibold">Contenido del curso</h2>
+      <button type="button" data-modal-target="addSectionModal" class="inline-flex items-center px-3 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
+        <i class="fas fa-plus mr-2"></i> Añadir sección
+      </button>
+    </div>
+    
+    <% if @sections.empty? %>
+      <div class="text-center py-8 bg-gray-50 rounded-lg">
+        <div class="text-gray-400 mb-4">
+          <i class="fas fa-folder-open text-5xl"></i>
+        </div>
+        <h3 class="text-lg font-medium text-gray-700 mb-2">No hay secciones todavía</h3>
+        <p class="text-gray-600 mb-6">Comienza añadiendo secciones a tu curso</p>
+        <button type="button" data-modal-target="addSectionModal" class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">
+          <i class="fas fa-plus mr-2"></i> Añadir primera sección
+        </button>
+      </div>
+    <% else %>
+      <div class="space-y-6">
+        <% @sections.each do |section| %>
+          <div class="border rounded-lg overflow-hidden">
+            <div class="bg-gray-50 p-4 flex justify-between items-center">
+              <div>
+                <h3 class="font-medium"><%= section.title %></h3>
+                <p class="text-sm text-gray-500"><%= pluralize(section.lessons.count, 'lección', 'lecciones') %></p>
+              </div>
+              <div class="flex space-x-2">
+                <button type="button" data-modal-target="addLessonModal<%= section.id %>" class="inline-flex items-center px-3 py-1 bg-indigo-100 text-indigo-700 rounded hover:bg-indigo-200">
+                  <i class="fas fa-plus mr-1"></i> Lección
+                </button>
+                <%= link_to edit_course_section_path(@course, section), class: "inline-flex items-center px-3 py-1 bg-gray-100 text-gray-700 rounded hover:bg-gray-200" do %>
+                  <i class="fas fa-edit"></i>
+                <% end %>
+              </div>
+            </div>
+            
+            <% if section.lessons.empty? %>
+              <div class="p-4 text-center text-gray-500">
+                <p>No hay lecciones en esta sección</p>
+                <button type="button" data-modal-target="addLessonModal<%= section.id %>" class="inline-flex items-center mt-2 px-3 py-1 text-indigo-600 hover:text-indigo-800">
+                  <i class="fas fa-plus mr-1"></i> Añadir lección
+                </button>
+              </div>
+            <% else %>
+              <ul class="divide-y">
+                <% section.lessons.order(position: :asc).each do |lesson| %>
+                  <li class="p-4 flex justify-between items-center hover:bg-gray-50">
+                    <div class="flex items-center">
+                      <% if lesson.video.attached? %>
+                        <i class="fas fa-play-circle text-indigo-500 mr-3"></i>
+                      <% else %>
+                        <i class="fas fa-file-alt text-gray-400 mr-3"></i>
+                      <% end %>
+                      <div>
+                        <h4 class="font-medium"><%= lesson.title %></h4>
+                        <% if lesson.is_free %>
+                          <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
+                            Vista previa gratuita
+                          </span>
+                        <% end %>
+                      </div>
+                    </div>
+                    <div class="flex space-x-2">
+                      <%= link_to course_section_lesson_path(@course, section, lesson), class: "text-indigo-600 hover:text-indigo-800" do %>
+                        <i class="fas fa-eye"></i>
+                      <% end %>
+                      <%= link_to edit_course_section_lesson_path(@course, section, lesson), class: "text-blue-600 hover:text-blue-800" do %>
+                        <i class="fas fa-edit"></i>
+                      <% end %>
+                    </div>
+                  </li>
+                <% end %>
+              </ul>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+    
+    <% if @course.has_content? && @course.draft? %>
+      <div class="mt-8 text-center">
+        <p class="text-gray-700 mb-4">¿Has terminado de añadir contenido a tu curso?</p>
+        <%= button_to course_path(@course), method: :patch, params: { course: { status: 'published' } }, 
+            class: "inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700" do %>
+          <i class="fas fa-globe mr-2"></i> Publicar curso
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<!-- Modales para agregar secciones y lecciones -->
+<div id="addSectionModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 hidden overflow-y-auto h-full w-full z-50">
+  <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+    <div class="flex justify-between items-center border-b pb-3">
+      <h3 class="text-lg font-medium">Agregar Nueva Sección</h3>
+      <button type="button" data-modal-hide="addSectionModal" class="text-gray-400 hover:text-gray-500">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    
+    <%= form_with(model: [@course, Section.new], local: true, class: "mt-4") do |f| %>
+      <div class="mb-4">
+        <%= f.label :title, "Título", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= f.text_field :title, class: "w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" %>
+      </div>
+      
+      <div class="mb-4">
+        <%= f.label :position, "Posición", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= f.number_field :position, min: 1, value: @course.sections.count + 1, class: "w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" %>
+      </div>
+      
+      <div class="flex justify-end space-x-3 mt-6">
+        <button type="button" data-modal-hide="addSectionModal" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300">
+          Cancelar
+        </button>
+        <%= f.submit "Guardar", class: "px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700" %>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<!-- Modales para agregar lecciones (uno por cada sección) -->
+<% @sections.each do |section| %>
+  <div id="addLessonModal<%= section.id %>" class="fixed inset-0 bg-gray-900 bg-opacity-50 hidden overflow-y-auto h-full w-full z-50">
+    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+      <div class="flex justify-between items-center border-b pb-3">
+        <h3 class="text-lg font-medium">Agregar Nueva Lección a "<%= section.title %>"</h3>
+        <button type="button" data-modal-hide="addLessonModal<%= section.id %>" class="text-gray-400 hover:text-gray-500">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      
+      <%= form_with(model: [@course, section, Lesson.new], local: true, class: "mt-4") do |f| %>
+        <div class="mb-4">
+          <%= f.label :title, "Título", class: "block text-sm font-medium text-gray-700 mb-1" %>
+          <%= f.text_field :title, class: "w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" %>
+        </div>
+        
+        <div class="mb-4">
+          <%= f.label :position, "Posición", class: "block text-sm font-medium text-gray-700 mb-1" %>
+          <%= f.number_field :position, min: 1, value: section.lessons.count + 1, class: "w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" %>
+        </div>
+        
+        <div class="mb-4">
+          <%= f.label :video, "Video", class: "block text-sm font-medium text-gray-700 mb-1" %>
+          <%= f.file_field :video, class: "w-full" %>
+        </div>
+        
+        <div class="mb-4">
+          <%= f.label :is_free, class: "flex items-center" do %>
+            <%= f.check_box :is_free, class: "h-4 w-4 text-indigo-600 border-gray-300 rounded mr-2" %>
+            <span class="text-sm font-medium text-gray-700">Lección gratuita (vista previa)</span>
+          <% end %>
+        </div>
+        
+        <div class="flex justify-end space-x-3 mt-6">
+          <button type="button" data-modal-hide="addLessonModal<%= section.id %>" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300">
+            Cancelar
+          </button>
+          <%= f.submit "Guardar", class: "px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+<% end %>
+
+<!-- Script para manejar los modales -->
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Función para mostrar modal
+    function showModal(modalId) {
+      document.getElementById(modalId).classList.remove('hidden');
+    }
+    
+    // Función para ocultar modal
+    function hideModal(modalId) {
+      document.getElementById(modalId).classList.add('hidden');
+    }
+    
+    // Configurar botones para mostrar modales
+    document.querySelectorAll('[data-modal-target]').forEach(button => {
+      button.addEventListener('click', function() {
+        const modalId = this.getAttribute('data-modal-target');
+        showModal(modalId);
+      });
+    });
+    
+    // Configurar botones para ocultar modales
+    document.querySelectorAll('[data-modal-hide]').forEach(button => {
+      button.addEventListener('click', function() {
+        const modalId = this.getAttribute('data-modal-hide');
+        hideModal(modalId);
+      });
+    });
+  });
+</script>

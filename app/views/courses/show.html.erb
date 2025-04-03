@@ -11,10 +11,16 @@
           <i class="fas fa-edit mr-2"></i> Editar Curso
         <% end %>
         
+        <%= link_to setup_course_path(@course), class: "bg-blue-100 text-blue-700 px-4 py-2 rounded-lg hover:bg-blue-200" do %>
+          <i class="fas fa-cog mr-2"></i> Configurar
+        <% end %>
+        
         <% if @course.draft? %>
-          <%= button_to course_path(@course, course: { status: :published }), method: :patch, 
-              class: "bg-green-100 text-green-700 px-4 py-2 rounded-lg hover:bg-green-200" do %>
-            <i class="fas fa-check-circle mr-2"></i> Publicar
+          <% if @course.has_content? %>
+            <%= button_to course_path(@course, course: { status: :published }), method: :patch, 
+                class: "bg-green-100 text-green-700 px-4 py-2 rounded-lg hover:bg-green-200" do %>
+              <i class="fas fa-check-circle mr-2"></i> Publicar
+            <% end %>
           <% end %>
         <% else %>
           <%= button_to course_path(@course, course: { status: :draft }), method: :patch, 
@@ -25,6 +31,23 @@
       </div>
     <% end %>
   </div>
+  
+  <% if current_user == @course.instructor && !@course.has_content? %>
+    <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
+      <div class="flex">
+        <div class="flex-shrink-0">
+          <i class="fas fa-exclamation-triangle text-yellow-400"></i>
+        </div>
+        <div class="ml-3">
+          <p class="text-sm text-yellow-700">
+            <strong>Curso incompleto:</strong> Tu curso aún no tiene secciones ni lecciones. 
+            <%= link_to "Completa la configuración", setup_course_path(@course), class: "font-medium underline text-yellow-700 hover:text-yellow-600" %> 
+            para poder publicarlo y que los estudiantes puedan inscribirse.
+          </p>
+        </div>
+      </div>
+    </div>
+  <% end %>
   
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
     <div class="lg:col-span-2">
@@ -51,7 +74,7 @@
           
           <% if current_user == @course.instructor || current_user&.admin? %>
             <!-- Botón para agregar sección -->
-            <button data-modal-target="addSectionModal" data-modal-toggle="addSectionModal" 
+            <button type="button" data-modal-target="addSectionModal" 
                 class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700">
               <i class="fas fa-plus mr-2"></i> Agregar Sección
             </button>
@@ -75,7 +98,7 @@
                 <% if current_user == @course.instructor || current_user&.admin? %>
                   <div class="flex space-x-2">
                     <!-- Botón para agregar lección -->
-                    <button data-modal-target="addLessonModal<%= section.id %>" data-modal-toggle="addLessonModal<%= section.id %>" 
+                    <button type="button" data-modal-target="addLessonModal<%= section.id %>" 
                         class="text-indigo-600 hover:text-indigo-800">
                       <i class="fas fa-plus-circle"></i> Agregar Lección
                     </button>
@@ -231,12 +254,12 @@
         <%= form_with(model: [@course, Section.new], local: true, class: "mt-4") do |f| %>
           <div class="mb-4">
             <%= f.label :title, "Título", class: "block text-sm font-medium text-gray-700 mb-1" %>
-            <%= f.text_field :title, class: "w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" %>
+            <%= f.text_field :title, required: true, class: "w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2" %>
           </div>
           
           <div class="mb-4">
             <%= f.label :position, "Posición", class: "block text-sm font-medium text-gray-700 mb-1" %>
-            <%= f.number_field :position, min: 1, class: "w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" %>
+            <%= f.number_field :position, min: 1, value: 1, class: "w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2" %>
           </div>
           
           <div class="flex justify-end space-x-3 mt-6">
@@ -263,17 +286,22 @@
           <%= form_with(model: [@course, section, Lesson.new], local: true, class: "mt-4") do |f| %>
             <div class="mb-4">
               <%= f.label :title, "Título", class: "block text-sm font-medium text-gray-700 mb-1" %>
-              <%= f.text_field :title, class: "w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" %>
+              <%= f.text_field :title, required: true, class: "w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2" %>
             </div>
             
             <div class="mb-4">
               <%= f.label :position, "Posición", class: "block text-sm font-medium text-gray-700 mb-1" %>
-              <%= f.number_field :position, min: 1, class: "w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" %>
+              <%= f.number_field :position, min: 1, value: 1, class: "w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2" %>
+            </div>
+            
+            <div class="mb-4">
+              <%= f.label :content, "Contenido", class: "block text-sm font-medium text-gray-700 mb-1" %>
+              <%= f.text_area :content, rows: 3, class: "w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2" %>
             </div>
             
             <div class="mb-4">
               <%= f.label :video, "Video", class: "block text-sm font-medium text-gray-700 mb-1" %>
-              <%= f.file_field :video, class: "w-full" %>
+              <%= f.file_field :video, class: "w-full p-2 border border-gray-300 rounded-md" %>
             </div>
             
             <div class="mb-4">
@@ -299,30 +327,74 @@
 <!-- Script para manejar los modales -->
 <script>
   document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM cargado - inicializando modales');
+    
     // Función para mostrar modal
     function showModal(modalId) {
-      document.getElementById(modalId).classList.remove('hidden');
+      console.log('Mostrando modal:', modalId);
+      const modal = document.getElementById(modalId);
+      if (modal) {
+        modal.classList.remove('hidden');
+      } else {
+        console.error('Modal no encontrado:', modalId);
+      }
     }
     
     // Función para ocultar modal
     function hideModal(modalId) {
-      document.getElementById(modalId).classList.add('hidden');
+      console.log('Ocultando modal:', modalId);
+      const modal = document.getElementById(modalId);
+      if (modal) {
+        modal.classList.add('hidden');
+      } else {
+        console.error('Modal no encontrado:', modalId);
+      }
     }
     
+    // Cerrar modal al hacer clic fuera del contenido
+    document.addEventListener('click', function(event) {
+      const modals = document.querySelectorAll('.fixed.inset-0.bg-gray-900');
+      modals.forEach(modal => {
+        if (event.target === modal) {
+          modal.classList.add('hidden');
+        }
+      });
+    });
+    
     // Configurar botones para mostrar modales
-    document.querySelectorAll('[data-modal-target]').forEach(button => {
-      button.addEventListener('click', function() {
+    const openButtons = document.querySelectorAll('[data-modal-target]');
+    console.log('Botones para abrir modales encontrados:', openButtons.length);
+    
+    openButtons.forEach(button => {
+      button.addEventListener('click', function(e) {
+        e.preventDefault();
         const modalId = this.getAttribute('data-modal-target');
+        console.log('Clic en botón para abrir modal:', modalId);
         showModal(modalId);
       });
     });
     
     // Configurar botones para ocultar modales
-    document.querySelectorAll('[data-modal-hide]').forEach(button => {
-      button.addEventListener('click', function() {
+    const closeButtons = document.querySelectorAll('[data-modal-hide]');
+    console.log('Botones para cerrar modales encontrados:', closeButtons.length);
+    
+    closeButtons.forEach(button => {
+      button.addEventListener('click', function(e) {
+        e.preventDefault();
         const modalId = this.getAttribute('data-modal-hide');
+        console.log('Clic en botón para cerrar modal:', modalId);
         hideModal(modalId);
       });
+    });
+    
+    // Manejar tecla Escape para cerrar modales
+    document.addEventListener('keydown', function(event) {
+      if (event.key === 'Escape') {
+        const visibleModals = document.querySelectorAll('.fixed.inset-0.bg-gray-900:not(.hidden)');
+        visibleModals.forEach(modal => {
+          modal.classList.add('hidden');
+        });
+      }
     });
   });
 </script>

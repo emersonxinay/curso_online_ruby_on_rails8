@@ -1,6 +1,6 @@
 class CoursesController < ApplicationController
   before_action :authenticate_user!, except: [:index, :show]
-  before_action :set_course, only: [:show, :edit, :update, :destroy]
+  before_action :set_course, only: [:show, :edit, :update, :destroy, :setup]
   before_action :ensure_instructor!, except: [:index, :show]
 
   def index
@@ -19,10 +19,24 @@ class CoursesController < ApplicationController
   def create
     @course = current_user.courses.build(course_params)
     if @course.save
-      redirect_to @course, notice: 'Course was successfully created.'
+      redirect_to setup_course_path(@course), notice: 'El curso ha sido creado exitosamente. Ahora completa el contenido.'
     else
       render :new
     end
+  end
+  
+  def setup
+    # Asegurarse de que el usuario sea el instructor del curso
+    unless @course.instructor == current_user || current_user.admin?
+      redirect_to root_path, alert: 'No estás autorizado para configurar este curso.'
+      return
+    end
+    
+    # Obtener las secciones y lecciones del curso
+    @sections = @course.sections.includes(:lessons).order(position: :asc)
+    
+    # Calcular el porcentaje de completitud del curso
+    @completion_percentage = @course.completion_percentage
   end
 
   def edit
@@ -32,7 +46,12 @@ class CoursesController < ApplicationController
   def update
     authorize_course_owner
     if @course.update(course_params)
-      redirect_to @course, notice: 'Course was successfully updated.'
+      # Si el curso no tiene contenido, redirigir a la página de configuración
+      if !@course.has_content? && params[:redirect_to] != 'show'
+        redirect_to setup_course_path(@course), notice: 'El curso ha sido actualizado. Ahora completa el contenido.'
+      else
+        redirect_to @course, notice: 'El curso ha sido actualizado exitosamente.'
+      end
     else
       render :edit
     end
