@@ -24,8 +24,17 @@ class Course < ApplicationRecord
 
   def progress(user)
     return 0 unless enrolled?(user)
-    completed_lessons = user.completed_lessons.where(section: sections).count
-    total_lessons = lessons.count
+    
+    # Obtener los IDs de las lecciones de este curso
+    lesson_ids = Lesson.joins(:section).where(sections: { course_id: id }).pluck(:id)
+    
+    # Contar las lecciones completadas por el usuario
+    completed_lessons = user.completed_lessons.where(lesson_id: lesson_ids).count
+    
+    # Contar el total de lecciones
+    total_lessons = lesson_ids.size
+    
+    # Calcular el porcentaje
     total_lessons.zero? ? 0 : (completed_lessons.to_f / total_lessons * 100).round
   end
   
@@ -50,6 +59,15 @@ class Course < ApplicationRecord
     
     # Calcular porcentaje total
     cover_image_score + description_score + section_score + lesson_score
+  end
+  
+  def generate_certificate(user)
+    return if certificates.exists?(user: user)
+    
+    certificates.create!(
+      user: user,
+      issued_at: Time.current
+    )
   end
   
   private

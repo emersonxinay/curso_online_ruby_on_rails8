@@ -49,8 +49,13 @@ gem "paypal-sdk-rest"
 gem "view_component"
 
 # PDF generation
-gem "wicked_pdf"
-gem "wkhtmltopdf-binary"
+gem "prawn"
+gem "prawn-table"
+gem "ttfunk"
+gem "prawn-templates"
+gem "prawn-svg"
+gem "prawn-icon"
+gem "prawn-html"
 
 # Performance improvements
 gem "oj"

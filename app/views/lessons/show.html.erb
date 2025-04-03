@@ -49,20 +49,16 @@
               <% if current_user == @course.instructor || current_user&.admin? %>
                 <%= link_to edit_course_section_lesson_path(@course, @section, @lesson), 
                     class: "text-blue-600 hover:text-blue-800" do %>
-                  <i class="fas fa-edit"></i> Editar
+                  <i class="fas fa-edit mr-1"></i> Editar
                 <% end %>
               <% end %>
               
-              <% unless current_user.completed_lessons.exists?(lesson: @lesson) %>
-                <%= button_to complete_course_section_lesson_path(@course, @section, @lesson), 
-                    method: :post, 
-                    class: "bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700" do %>
-                  <i class="fas fa-check mr-2"></i> Marcar como completada
-                <% end %>
-              <% else %>
-                <div class="bg-green-100 text-green-800 px-4 py-2 rounded-lg flex items-center">
-                  <i class="fas fa-check-circle mr-2"></i> Completada
-                </div>
+              <% if !current_user.completed_lessons.exists?(lesson: @lesson) %>
+                <%= button_to 'Marcar como completada', 
+                    mark_as_completed_lesson_path(@lesson),
+                    method: :post,
+                    class: "inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
+                %>
               <% end %>
             </div>
           </div>

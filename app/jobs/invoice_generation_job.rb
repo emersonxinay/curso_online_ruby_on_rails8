@@ -2,21 +2,29 @@ class InvoiceGenerationJob < ApplicationJob
   queue_as :default
 
   def perform(payment)
-    # Obtener datos necesarios para la factura
-    @payment = payment
-    @enrollment = payment.enrollment
-    @course = @enrollment.course
-    @student = @enrollment.user
-    @instructor = @course.instructor
+    begin
+      # Obtener datos necesarios para la factura
+      @payment = payment
+      @enrollment = payment.enrollment
+      @course = @enrollment.course
+      @student = @enrollment.user
+      @instructor = @course.instructor
 
-    # Generar el PDF de la factura usando WickedPDF
-    pdf_content = generate_pdf
-    
-    # Guardar el PDF en el sistema de archivos o en Active Storage
-    save_invoice(pdf_content)
-    
-    # Enviar la factura por correo electrónico
-    InvoiceMailer.send_invoice(@payment).deliver_later
+      # Generar el PDF de la factura usando WickedPDF
+      pdf_content = generate_pdf
+      
+      # Guardar el PDF en el sistema de archivos o en Active Storage
+      save_invoice(pdf_content)
+      
+      # Enviar la factura por correo electrónico si existe el mailer
+      if defined?(InvoiceMailer) && InvoiceMailer.respond_to?(:send_invoice)
+        InvoiceMailer.send_invoice(@payment).deliver_later
+      end
+    rescue => e
+      # Registrar el error pero permitir que el proceso continúe
+      Rails.logger.error("Error generando factura para payment #{payment.id}: #{e.message}")
+      Rails.logger.error(e.backtrace.join("\n"))
+    end
   end
 
   private
@@ -113,24 +121,27 @@ class InvoiceGenerationJob < ApplicationJob
 
   def save_invoice(pdf_content)
     # Crear un nombre de archivo único para la factura
-    filename = "invoice_#{@payment.id}_#{Time.now.to_i}.pdf"
+    filename = "invoice_#{@payment.id}_#{Time.current.to_i}.pdf"
     
-    # En una implementación real, esto guardaría el PDF en Active Storage
-    # @payment.invoice.attach(
-    #   io: StringIO.new(pdf_content),
-    #   filename: filename,
-    #   content_type: 'application/pdf'
-    # )
-    
-    # Para esta implementación simplificada, guardamos en el sistema de archivos
-    invoice_path = Rails.root.join('storage', 'invoices', filename)
-    FileUtils.mkdir_p(File.dirname(invoice_path))
-    
-    File.open(invoice_path, 'wb') do |file|
-      file.write(pdf_content)
+    begin
+      # En Rails 8, usamos exclusivamente Active Storage
+      # Adjuntar el PDF al registro de pago
+      @payment.invoice.attach(
+        io: StringIO.new(pdf_content),
+        filename: filename,
+        content_type: 'application/pdf'
+      )
+      
+      # Actualizar el número de factura en el registro de pago
+      # No necesitamos guardar la URL, ya que podemos acceder al archivo a través de @payment.invoice
+      @payment.update(invoice_number: "INV-#{@payment.id}-#{Time.current.to_i}")
+      
+      # Registrar la generación exitosa de la factura
+      Rails.logger.info("Factura generada exitosamente para el pago #{@payment.id}")
+    rescue => e
+      # Registrar el error pero permitir que el proceso continúe
+      Rails.logger.error("Error guardando factura para payment #{@payment.id}: #{e.message}")
+      Rails.logger.error(e.backtrace.join("\n"))
     end
-    
-    # Guardar la ruta del archivo en el registro de pago
-    @payment.update(invoice_path: "invoices/#{filename}")
   end
 end

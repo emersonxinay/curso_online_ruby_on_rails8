@@ -2,8 +2,11 @@ class Payment < ApplicationRecord
   belongs_to :enrollment
   belongs_to :user
   
-  enum status: { pending: 0, completed: 1, failed: 2, refunded: 3 }
-  enum payment_method: { stripe: 0, paypal: 1, bank_transfer: 2 }
+  # Adjuntar factura con Active Storage
+  has_one_attached :invoice
+  
+  enum :status, { pending: 0, completed: 1, failed: 2, refunded: 3 }
+  enum :payment_method, { stripe: 0, paypal: 1, bank_transfer: 2 }
   
   validates :amount, presence: true, numericality: { greater_than: 0 }
   validates :payment_method, presence: true
@@ -19,6 +22,9 @@ class Payment < ApplicationRecord
   private
   
   def generate_invoice
+    # Implementación básica del generador de facturas
+    # Se puede expandir según los requisitos específicos
+    update(invoice_number: "INV-#{Time.current.to_i}-#{id}")
     InvoiceGenerationJob.perform_later(self)
   end
 end

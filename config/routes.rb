@@ -11,6 +11,7 @@ Rails.application.routes.draw do
       resources :lessons, except: [:index] do
         member do
           post :complete
+          post :mark_as_completed
         end
       end
     end

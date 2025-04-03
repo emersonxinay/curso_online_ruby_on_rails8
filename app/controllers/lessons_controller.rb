@@ -75,6 +75,26 @@ class LessonsController < ApplicationController
     end
   end
 
+  def mark_as_completed
+    @lesson = Lesson.find(params[:id])
+    @course = @lesson.section.course
+    
+    if current_user.completed_lessons.create(lesson: @lesson)
+      # Verificar si el usuario completó todas las lecciones del curso
+      all_lessons = @course.lessons.joins(:section).pluck(:id)
+      completed = current_user.completed_lessons.where(lesson_id: all_lessons).count
+      
+      if completed == all_lessons.size
+        # Generar certificado si no existe
+        @course.generate_certificate(current_user)
+      end
+      
+      redirect_to course_path(@course), notice: 'Lección marcada como completada.'
+    else
+      redirect_to course_path(@course), alert: 'No se pudo marcar la lección como completada.'
+    end
+  end
+
   private
 
   def set_course
@@ -100,11 +120,28 @@ class LessonsController < ApplicationController
   end
 
   def ensure_enrolled!
-    unless @lesson.is_free || current_user.admin? || 
-           @course.instructor == current_user || 
-           current_user.enrolled?(@course)
+    # Si la lección es gratuita, o el usuario es admin o instructor, permitir acceso
+    return true if @lesson.is_free || current_user.admin? || @course.instructor == current_user
+    
+    # Verificar si el usuario está inscrito
+    enrollment = current_user.enrollments.find_by(course: @course)
+    
+    if enrollment.nil?
+      # Usuario no inscrito
       redirect_to course_path(@course), 
                   alert: 'Necesitas estar inscrito en este curso para ver esta lección.'
+      return
     end
+    
+    # Verificar si la inscripción está activa (pago completado)
+    unless enrollment.active?
+      # Inscripción pendiente o inactiva
+      redirect_to course_path(@course), 
+                  alert: 'Tu inscripción está pendiente de pago. Por favor, completa el proceso de pago para acceder al contenido del curso.'
+      return
+    end
+    
+    # Usuario inscrito con inscripción activa
+    true
   end
 end

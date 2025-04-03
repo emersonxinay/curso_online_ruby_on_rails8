@@ -1,6 +1,7 @@
 GEM
   remote: https://rubygems.org/
   specs:
+    Ascii85 (2.0.1)
     actioncable (8.0.2)
       actionpack (= 8.0.2)
       activesupport (= 8.0.2)
@@ -74,6 +75,8 @@ GEM
       uri (>= 0.13.1)
     addressable (2.8.7)
       public_suffix (>= 2.0.2, < 7.0)
+    afm (0.2.2)
+    ansi (1.5.0)
     ast (2.4.3)
     base64 (0.2.0)
     bcrypt (3.1.20)
@@ -103,6 +106,8 @@ GEM
     concurrent-ruby (1.3.5)
     connection_pool (2.5.0)
     crass (1.0.6)
+    css_parser (1.21.1)
+      addressable
     cssbundling-rails (1.4.3)
       railties (>= 6.0.0)
     date (3.4.1)
@@ -141,6 +146,7 @@ GEM
       raabro (~> 1.4)
     globalid (1.2.1)
       activesupport (>= 6.1)
+    hashery (2.1.2)
     i18n (1.14.7)
       concurrent-ruby (~> 1.0)
     image_processing (1.14.0)
@@ -218,6 +224,9 @@ GEM
       racc (~> 1.4)
     nokogiri (1.18.7-x86_64-linux-musl)
       racc (~> 1.4)
+    oga (3.4)
+      ast
+      ruby-ll (~> 2.1)
     oj (3.16.10)
       bigdecimal (>= 3.0)
       ostruct (>= 0.2)
@@ -232,9 +241,35 @@ GEM
     paypal-sdk-rest (1.7.6)
       multi_json (~> 1.0)
       xml-simple
+    pdf-core (0.10.0)
+    pdf-reader (2.14.1)
+      Ascii85 (>= 1.0, < 3.0, != 2.0.0)
+      afm (~> 0.2.1)
+      hashery (~> 2.0)
+      ruby-rc4
+      ttfunk
     pg (1.5.9)
     pp (0.6.2)
       prettyprint
+    prawn (2.5.0)
+      matrix (~> 0.4)
+      pdf-core (~> 0.10.0)
+      ttfunk (~> 1.8)
+    prawn-html (0.7.1)
+      oga (~> 3.3)
+      prawn (~> 2.4)
+    prawn-icon (4.1.0)
+      prawn (>= 1.1.0, < 3.0.0)
+    prawn-svg (0.37.0)
+      css_parser (~> 1.6)
+      matrix (~> 0.4.2)
+      prawn (>= 0.11.1, < 3)
+      rexml (>= 3.3.9, < 4)
+    prawn-table (0.2.2)
+      prawn (>= 1.3.0, < 3.0.0)
+    prawn-templates (0.1.2)
+      pdf-reader (~> 2.0)
+      prawn (~> 2.2)
     prettyprint (0.2.0)
     prism (1.4.0)
     propshaft (1.1.0)
@@ -348,7 +383,11 @@ GEM
       rubocop (>= 1.72)
       rubocop-performance (>= 1.24)
       rubocop-rails (>= 2.30)
+    ruby-ll (2.1.3)
+      ansi
+      ast
     ruby-progressbar (1.13.0)
+    ruby-rc4 (0.1.5)
     ruby-vips (2.2.3)
       ffi (~> 1.12)
       logger
@@ -395,6 +434,8 @@ GEM
     timeout (0.4.3)
     tinymce-rails (7.7.1)
       railties (>= 3.1.1)
+    ttfunk (1.8.0)
+      bigdecimal (~> 3.1)
     turbo-rails (2.0.13)
       actionpack (>= 7.1.0)
       railties (>= 7.1.0)
@@ -421,10 +462,6 @@ GEM
       base64
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.5)
-    wicked_pdf (2.8.2)
-      activesupport
-      ostruct
-    wkhtmltopdf-binary (0.12.6.8)
     xml-simple (1.1.9)
       rexml
     xpath (3.2.0)
@@ -464,6 +501,12 @@ DEPENDENCIES
   pay (~> 6.0)
   paypal-sdk-rest
   pg (~> 1.1)
+  prawn
+  prawn-html
+  prawn-icon
+  prawn-svg
+  prawn-table
+  prawn-templates
   propshaft
   puma (>= 5.0)
   rails (~> 8.0.0)
@@ -478,11 +521,10 @@ DEPENDENCIES
   stripe (~> 9.0)
   tailwindcss-rails (~> 2.3)
   tinymce-rails
+  ttfunk
   turbo-rails
   view_component
   web-console
-  wicked_pdf
-  wkhtmltopdf-binary
 
 BUNDLED WITH
    2.6.3

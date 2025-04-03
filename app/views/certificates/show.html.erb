@@ -30,7 +30,7 @@
       </div>
       
       <div class="mt-8">
-        <%= link_to "Descargar PDF", download_certificate_path(@certificate, format: :pdf), 
+        <%= link_to download_certificate_path(@certificate, format: :pdf),
             class: "inline-flex items-center px-6 py-3 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700" do %>
           <i class="fas fa-download mr-2"></i> Descargar Certificado
         <% end %>

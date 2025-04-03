@@ -7,6 +7,7 @@
     "@rails/actiontext": "^8.0.200",
     "@vue/reactivity": "^3.5.13",
     "alpinejs": "^3.14.9",
+    "caniuse-lite": "^1.0.30001709",
     "trix": "^2.1.13"
   },
   "devDependencies": {
