@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
+  <style>
+    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+    .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+    .header { text-align: center; margin-bottom: 20px; }
+    .content { background-color: #f9f9f9; padding: 20px; border-radius: 5px; }
+    .footer { text-align: center; margin-top: 20px; font-size: 12px; color: #777; }
+    .button { display: inline-block; background-color: #4F46E5; color: white; text-decoration: none; padding: 10px 20px; border-radius: 5px; }
+    .invoice-details { margin: 20px 0; padding: 15px; background-color: #e9ecef; border-radius: 5px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Tu Factura</h1>
+    </div>
+    
+    <div class="content">
+      <p>Hola <%= @user.name %>,</p>
+      
+      <p>Adjunto encontrarás la factura correspondiente a tu compra del curso <strong><%= @course.title %></strong>.</p>
+      
+      <div class="invoice-details">
+        <p><strong>Detalles de la compra:</strong></p>
+        <ul>
+          <li>Curso: <%= @course.title %></li>
+          <li>Fecha de compra: <%= @payment.created_at.strftime("%d/%m/%Y") %></li>
+          <li>Monto: $<%= sprintf('%.2f', @payment.amount) %></li>
+          <li>Método de pago: <%= @payment.payment_method.humanize %></li>
+          <li>Número de factura: <%= @payment.id %></li>
+        </ul>
+      </div>
+      
+      <p>Puedes acceder al curso desde tu dashboard de estudiante.</p>
+      
+      <p style="text-align: center; margin-top: 30px;">
+        <a href="<%= dashboard_student_url %>" class="button">Ir a Mi Aprendizaje</a>
+      </p>
+      
+      <p>Si tienes alguna pregunta sobre tu factura o necesitas asistencia adicional, no dudes en contactarnos.</p>
+    </div>
+    
+    <div class="footer">
+      <p>© <%= Time.now.year %> Cursos en Línea. Todos los derechos reservados.</p>
+      <p>Este correo electrónico y cualquier archivo adjunto son confidenciales y están destinados únicamente para el uso del destinatario.</p>
+    </div>
+  </div>
+</body>
+</html>

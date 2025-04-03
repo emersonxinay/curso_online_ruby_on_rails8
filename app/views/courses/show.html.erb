@@ -1,62 +1,328 @@
 <div class="container mx-auto px-4 py-8">
+  <div class="flex justify-between items-center mb-6">
+    <div>
+      <h1 class="text-4xl font-bold"><%= @course.title %></h1>
+      <p class="text-gray-600 mt-2">Instructor: <%= @course.instructor.name %></p>
+    </div>
+    
+    <% if current_user == @course.instructor || current_user&.admin? %>
+      <div class="flex space-x-3">
+        <%= link_to edit_course_path(@course), class: "bg-indigo-100 text-indigo-700 px-4 py-2 rounded-lg hover:bg-indigo-200" do %>
+          <i class="fas fa-edit mr-2"></i> Editar Curso
+        <% end %>
+        
+        <% if @course.draft? %>
+          <%= button_to course_path(@course, course: { status: :published }), method: :patch, 
+              class: "bg-green-100 text-green-700 px-4 py-2 rounded-lg hover:bg-green-200" do %>
+            <i class="fas fa-check-circle mr-2"></i> Publicar
+          <% end %>
+        <% else %>
+          <%= button_to course_path(@course, course: { status: :draft }), method: :patch, 
+              class: "bg-yellow-100 text-yellow-700 px-4 py-2 rounded-lg hover:bg-yellow-200" do %>
+            <i class="fas fa-eye-slash mr-2"></i> Pasar a Borrador
+          <% end %>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+  
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
     <div class="lg:col-span-2">
-      <h1 class="text-4xl font-bold mb-4"><%= @course.title %></h1>
-      
-      <div class="mb-8 prose">
-        <%= @course.description %>
+      <div class="bg-white rounded-lg shadow-md overflow-hidden mb-8">
+        <% if @course.cover_image.attached? %>
+          <%= image_tag @course.cover_image, class: "w-full h-64 object-cover" %>
+        <% else %>
+          <div class="w-full h-64 bg-gray-200 flex items-center justify-center">
+            <span class="text-gray-400 text-lg">Sin imagen de portada</span>
+          </div>
+        <% end %>
+        
+        <div class="p-6">
+          <div class="prose max-w-none">
+            <%= @course.description %>
+          </div>
+        </div>
       </div>
 
-      <% if @enrolled || current_user == @course.instructor %>
-        <div class="space-y-6">
+      <!-- Secciones y Lecciones -->
+      <div class="space-y-6">
+        <div class="flex justify-between items-center">
+          <h2 class="text-2xl font-bold">Contenido del Curso</h2>
+          
+          <% if current_user == @course.instructor || current_user&.admin? %>
+            <!-- Botón para agregar sección -->
+            <button data-modal-target="addSectionModal" data-modal-toggle="addSectionModal" 
+                class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700">
+              <i class="fas fa-plus mr-2"></i> Agregar Sección
+            </button>
+          <% end %>
+        </div>
+        
+        <% if @sections.empty? %>
+          <div class="bg-gray-50 border border-gray-200 rounded-lg p-8 text-center">
+            <p class="text-gray-500">Este curso aún no tiene secciones.</p>
+            <% if current_user == @course.instructor || current_user&.admin? %>
+              <p class="text-gray-500 mt-2">Haz clic en "Agregar Sección" para comenzar a crear contenido.</p>
+            <% end %>
+          </div>
+        <% else %>
           <% @sections.each do |section| %>
-            <div class="bg-white rounded-lg shadow p-6">
-              <h3 class="text-xl font-semibold mb-4"><%= section.title %></h3>
-              
-              <div class="space-y-2">
-                <% section.lessons.each do |lesson| %>
-                  <%= link_to course_section_lesson_path(@course, section, lesson), 
-                      class: "flex items-center justify-between p-3 hover:bg-gray-50 rounded" do %>
-                    <span><%= lesson.title %></span>
-                    <% if current_user.completed_lessons.exists?(lesson: lesson) %>
-                      <span class="text-green-500">✓</span>
+            <div class="bg-white rounded-lg shadow-md overflow-hidden">
+              <!-- Encabezado de la sección -->
+              <div class="bg-gray-50 p-4 border-b flex justify-between items-center">
+                <h3 class="text-xl font-semibold"><%= section.title %></h3>
+                
+                <% if current_user == @course.instructor || current_user&.admin? %>
+                  <div class="flex space-x-2">
+                    <!-- Botón para agregar lección -->
+                    <button data-modal-target="addLessonModal<%= section.id %>" data-modal-toggle="addLessonModal<%= section.id %>" 
+                        class="text-indigo-600 hover:text-indigo-800">
+                      <i class="fas fa-plus-circle"></i> Agregar Lección
+                    </button>
+                    
+                    <!-- Botón para editar sección -->
+                    <%= link_to edit_course_section_path(@course, section), class: "text-blue-600 hover:text-blue-800" do %>
+                      <i class="fas fa-edit"></i>
                     <% end %>
+                    
+                    <!-- Botón para eliminar sección -->
+                    <%= button_to course_section_path(@course, section), method: :delete, 
+                        data: { confirm: "¿Estás seguro? Se eliminarán todas las lecciones de esta sección." }, 
+                        class: "text-red-600 hover:text-red-800" do %>
+                      <i class="fas fa-trash"></i>
+                    <% end %>
+                  </div>
+                <% end %>
+              </div>
+              
+              <!-- Lecciones de la sección -->
+              <div class="divide-y">
+                <% if section.lessons.empty? %>
+                  <div class="p-4 text-center text-gray-500">
+                    No hay lecciones en esta sección.
+                  </div>
+                <% else %>
+                  <% section.lessons.each do |lesson| %>
+                    <div class="p-4 hover:bg-gray-50 transition-colors">
+                      <%= link_to course_section_lesson_path(@course, section, lesson), 
+                          class: "flex items-center justify-between" do %>
+                        <div class="flex items-center">
+                          <% if lesson.video.attached? %>
+                            <i class="fas fa-play-circle text-indigo-500 mr-3 text-xl"></i>
+                          <% else %>
+                            <i class="fas fa-file-alt text-gray-500 mr-3 text-xl"></i>
+                          <% end %>
+                          <span><%= lesson.title %></span>
+                        </div>
+                        
+                        <div class="flex items-center">
+                          <% if @enrolled && current_user.completed_lessons.exists?(lesson: lesson) %>
+                            <span class="text-green-500 mr-3"><i class="fas fa-check-circle"></i> Completada</span>
+                          <% end %>
+                          
+                          <% if current_user == @course.instructor || current_user&.admin? %>
+                            <div class="flex space-x-2 ml-4">
+                              <%= link_to edit_course_section_lesson_path(@course, section, lesson), 
+                                  class: "text-blue-600 hover:text-blue-800" do %>
+                                <i class="fas fa-edit"></i>
+                              <% end %>
+                              
+                              <%= button_to course_section_lesson_path(@course, section, lesson), 
+                                  method: :delete, 
+                                  data: { confirm: "¿Estás seguro de eliminar esta lección?" }, 
+                                  class: "text-red-600 hover:text-red-800" do %>
+                                <i class="fas fa-trash"></i>
+                              <% end %>
+                            </div>
+                          <% end %>
+                        </div>
+                      <% end %>
+                    </div>
                   <% end %>
                 <% end %>
               </div>
             </div>
           <% end %>
-        </div>
-      <% end %>
+        <% end %>
+      </div>
     </div>
 
     <div class="lg:col-span-1">
-      <div class="bg-white rounded-lg shadow p-6 sticky top-4">
+      <div class="bg-white rounded-lg shadow-md p-6 sticky top-4">
         <% if @course.cover_image.attached? %>
           <%= image_tag @course.cover_image, class: "w-full h-48 object-cover rounded mb-4" %>
         <% end %>
 
-        <div class="text-3xl font-bold mb-4">$<%= @course.price %></div>
+        <div class="flex items-center justify-between mb-4">
+          <div class="text-3xl font-bold">$<%= @course.price %></div>
+          <div class="px-3 py-1 rounded <%= @course.published? ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' %>">
+            <%= @course.status.capitalize %>
+          </div>
+        </div>
 
         <% if @enrolled %>
-          <div class="bg-green-100 text-green-800 p-4 rounded mb-4">
-            You are enrolled in this course
+          <div class="bg-green-100 text-green-800 p-4 rounded mb-4 text-center">
+            <i class="fas fa-check-circle text-xl mr-2"></i> Ya estás inscrito en este curso
           </div>
-        <% elsif current_user != @course.instructor %>
-          <%= button_to "Enroll Now", course_enrollments_path(@course), 
-              class: "w-full bg-indigo-600 text-white py-3 rounded font-semibold hover:bg-indigo-700" %>
+          
+          <div class="mb-4">
+            <div class="flex justify-between items-center mb-2">
+              <span class="text-gray-700 font-medium">Tu progreso</span>
+              <span class="text-sm text-gray-500"><%= @course.progress(current_user) %>%</span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-2.5">
+              <div class="bg-indigo-600 h-2.5 rounded-full" style="width: <%= @course.progress(current_user) %>%"></div>
+            </div>
+          </div>
+          
+          <%= link_to course_section_lesson_path(@course, @sections.first, @sections.first&.lessons&.first), 
+              class: "w-full bg-indigo-600 text-white py-3 rounded-lg font-semibold hover:bg-indigo-700 text-center block mb-4" do %>
+            <i class="fas fa-play-circle mr-2"></i> Continuar Aprendiendo
+          <% end %>
+        <% elsif current_user != @course.instructor && @course.published? %>
+          <%= button_to course_enrollments_path(@course), 
+              class: "w-full bg-indigo-600 text-white py-3 rounded-lg font-semibold hover:bg-indigo-700 mb-4" do %>
+            <i class="fas fa-shopping-cart mr-2"></i> Inscribirse Ahora
+          <% end %>
         <% end %>
 
         <div class="mt-6">
-          <h4 class="font-semibold mb-2">This course includes:</h4>
+          <h4 class="font-semibold mb-2">Este curso incluye:</h4>
           <ul class="space-y-2">
-            <li>• <%= @course.lessons.count %> lessons</li>
-            <li>• Full lifetime access</li>
-            <li>• Access on mobile and TV</li>
-            <li>• Certificate of completion</li>
+            <li class="flex items-center"><i class="fas fa-book text-indigo-500 mr-2"></i> <%= @course.lessons.count %> lecciones</li>
+            <li class="flex items-center"><i class="fas fa-infinity text-indigo-500 mr-2"></i> Acceso de por vida</li>
+            <li class="flex items-center"><i class="fas fa-mobile-alt text-indigo-500 mr-2"></i> Acceso en móvil y TV</li>
+            <li class="flex items-center"><i class="fas fa-certificate text-indigo-500 mr-2"></i> Certificado de finalización</li>
           </ul>
+        </div>
+        
+        <div class="mt-6 border-t pt-6">
+          <h4 class="font-semibold mb-2">Instructor:</h4>
+          <div class="flex items-center">
+            <% if @course.instructor.avatar.attached? %>
+              <%= image_tag @course.instructor.avatar, class: "w-12 h-12 rounded-full mr-3 object-cover" %>
+            <% else %>
+              <div class="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center mr-3">
+                <span class="text-gray-500 text-xl"><%= @course.instructor.name[0] %></span>
+              </div>
+            <% end %>
+            <div>
+              <p class="font-medium"><%= @course.instructor.name %></p>
+              <p class="text-sm text-gray-500"><%= @course.instructor.courses.count %> cursos</p>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   </div>
+  
+  <!-- Modales para agregar secciones y lecciones -->
+  <% if current_user == @course.instructor || current_user&.admin? %>
+    <!-- Modal para agregar sección -->
+    <div id="addSectionModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 hidden overflow-y-auto h-full w-full z-50">
+      <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+        <div class="flex justify-between items-center border-b pb-3">
+          <h3 class="text-lg font-medium">Agregar Nueva Sección</h3>
+          <button type="button" data-modal-hide="addSectionModal" class="text-gray-400 hover:text-gray-500">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        
+        <%= form_with(model: [@course, Section.new], local: true, class: "mt-4") do |f| %>
+          <div class="mb-4">
+            <%= f.label :title, "Título", class: "block text-sm font-medium text-gray-700 mb-1" %>
+            <%= f.text_field :title, class: "w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" %>
+          </div>
+          
+          <div class="mb-4">
+            <%= f.label :position, "Posición", class: "block text-sm font-medium text-gray-700 mb-1" %>
+            <%= f.number_field :position, min: 1, class: "w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" %>
+          </div>
+          
+          <div class="flex justify-end space-x-3 mt-6">
+            <button type="button" data-modal-hide="addSectionModal" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300">
+              Cancelar
+            </button>
+            <%= f.submit "Guardar", class: "px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700" %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+    
+    <!-- Modales para agregar lecciones (uno por cada sección) -->
+    <% @sections.each do |section| %>
+      <div id="addLessonModal<%= section.id %>" class="fixed inset-0 bg-gray-900 bg-opacity-50 hidden overflow-y-auto h-full w-full z-50">
+        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+          <div class="flex justify-between items-center border-b pb-3">
+            <h3 class="text-lg font-medium">Agregar Nueva Lección a "<%= section.title %>"</h3>
+            <button type="button" data-modal-hide="addLessonModal<%= section.id %>" class="text-gray-400 hover:text-gray-500">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+          
+          <%= form_with(model: [@course, section, Lesson.new], local: true, class: "mt-4") do |f| %>
+            <div class="mb-4">
+              <%= f.label :title, "Título", class: "block text-sm font-medium text-gray-700 mb-1" %>
+              <%= f.text_field :title, class: "w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" %>
+            </div>
+            
+            <div class="mb-4">
+              <%= f.label :position, "Posición", class: "block text-sm font-medium text-gray-700 mb-1" %>
+              <%= f.number_field :position, min: 1, class: "w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" %>
+            </div>
+            
+            <div class="mb-4">
+              <%= f.label :video, "Video", class: "block text-sm font-medium text-gray-700 mb-1" %>
+              <%= f.file_field :video, class: "w-full" %>
+            </div>
+            
+            <div class="mb-4">
+              <%= f.label :is_free, class: "flex items-center" do %>
+                <%= f.check_box :is_free, class: "h-4 w-4 text-indigo-600 border-gray-300 rounded mr-2" %>
+                <span class="text-sm font-medium text-gray-700">Lección gratuita (vista previa)</span>
+              <% end %>
+            </div>
+            
+            <div class="flex justify-end space-x-3 mt-6">
+              <button type="button" data-modal-hide="addLessonModal<%= section.id %>" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300">
+                Cancelar
+              </button>
+              <%= f.submit "Guardar", class: "px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700" %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  <% end %>
 </div>
+
+<!-- Script para manejar los modales -->
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Función para mostrar modal
+    function showModal(modalId) {
+      document.getElementById(modalId).classList.remove('hidden');
+    }
+    
+    // Función para ocultar modal
+    function hideModal(modalId) {
+      document.getElementById(modalId).classList.add('hidden');
+    }
+    
+    // Configurar botones para mostrar modales
+    document.querySelectorAll('[data-modal-target]').forEach(button => {
+      button.addEventListener('click', function() {
+        const modalId = this.getAttribute('data-modal-target');
+        showModal(modalId);
+      });
+    });
+    
+    // Configurar botones para ocultar modales
+    document.querySelectorAll('[data-modal-hide]').forEach(button => {
+      button.addEventListener('click', function() {
+        const modalId = this.getAttribute('data-modal-hide');
+        hideModal(modalId);
+      });
+    });
+  });
+</script>

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
+  <style>
+    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+    .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+    .header { text-align: center; margin-bottom: 20px; }
+    .content { background-color: #f9f9f9; padding: 20px; border-radius: 5px; }
+    .footer { text-align: center; margin-top: 20px; font-size: 12px; color: #777; }
+    .button { display: inline-block; background-color: #4F46E5; color: white; text-decoration: none; padding: 10px 20px; border-radius: 5px; }
+    .course-info { margin: 20px 0; padding: 15px; background-color: #e9ecef; border-radius: 5px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Tu curso ha sido actualizado</h1>
+    </div>
+    
+    <div class="content">
+      <p>Hola <%= @instructor.name %>,</p>
+      
+      <p>Te informamos que tu curso <strong><%= @course.title %></strong> ha sido actualizado.</p>
+      
+      <div class="course-info">
+        <p><strong>Detalles del curso:</strong></p>
+        <ul>
+          <li>Título: <%= @course.title %></li>
+          <li>Estado: <%= @course.status.humanize %></li>
+          <li>Precio: $<%= sprintf('%.2f', @course.price) %></li>
+          <li>Última actualización: <%= @course.updated_at.strftime("%d/%m/%Y %H:%M") %></li>
+        </ul>
+      </div>
+      
+      <p>Puedes revisar los cambios y gestionar tu curso desde tu dashboard de instructor.</p>
+      
+      <p style="text-align: center; margin-top: 30px;">
+        <a href="<%= dashboard_instructor_url %>" class="button">Ver Dashboard</a>
+      </p>
+    </div>
+    
+    <div class="footer">
+      <p>© <%= Time.now.year %> Cursos en Línea. Todos los derechos reservados.</p>
+    </div>
+  </div>
+</body>
+</html>

@@ -4,6 +4,7 @@ class Course < ApplicationRecord
   has_many :lessons, through: :sections
   has_many :enrollments, dependent: :restrict_with_error
   has_many :enrolled_users, through: :enrollments, source: :user
+  has_many :certificates, dependent: :destroy
   has_one_attached :cover_image
   has_rich_text :description
 

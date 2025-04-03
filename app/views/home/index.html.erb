@@ -9,13 +9,35 @@
         Descubre una nueva forma de aprender con nuestros cursos interactivos diseñados para impulsar tu carrera profesional.
       </p>
       <div class="space-x-4">
-        <a href="/courses" class="btn bg-white text-blue-600 hover:bg-blue-50 shadow-lg hover:shadow-xl">
+        <a href="<%= courses_path %>" class="btn bg-white text-blue-600 hover:bg-blue-50 shadow-lg hover:shadow-xl px-6 py-3 rounded-lg font-semibold">
           Explorar Cursos
         </a>
-        <a href="/about" class="btn border-2 border-white text-white hover:bg-white hover:text-blue-600">
+        <a href="<%= about_path %>" class="btn border-2 border-white text-white hover:bg-white hover:text-blue-600 px-6 py-3 rounded-lg font-semibold">
           Conoce Más
         </a>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- Featured Courses Section -->
+<div class="py-16 bg-white">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between items-center mb-8">
+      <h2 class="text-3xl font-bold text-gray-900">Cursos Destacados</h2>
+      <a href="<%= courses_path %>" class="text-indigo-600 hover:text-indigo-800 font-medium">Ver todos →</a>
+    </div>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <% if @featured_courses.any? %>
+        <% @featured_courses.each do |course| %>
+          <%= render 'courses/course_card', course: course %>
+        <% end %>
+      <% else %>
+        <div class="col-span-3 text-center py-12">
+          <p class="text-gray-500 text-lg">No hay cursos destacados disponibles en este momento.</p>
+        </div>
+      <% end %>
     </div>
   </div>
 </div>
@@ -30,7 +52,7 @@
     
     <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
       <!-- Feature 1 -->
-      <div class="stat-card flex flex-col items-center text-center p-8">
+      <div class="stat-card flex flex-col items-center text-center p-8 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow">
         <div class="rounded-full bg-blue-100 p-3 mb-4">
           <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
@@ -41,7 +63,7 @@
       </div>
 
       <!-- Feature 2 -->
-      <div class="stat-card flex flex-col items-center text-center p-8">
+      <div class="stat-card flex flex-col items-center text-center p-8 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow">
         <div class="rounded-full bg-blue-100 p-3 mb-4">
           <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
@@ -52,7 +74,7 @@
       </div>
 
       <!-- Feature 3 -->
-      <div class="stat-card flex flex-col items-center text-center p-8">
+      <div class="stat-card flex flex-col items-center text-center p-8 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow">
         <div class="rounded-full bg-blue-100 p-3 mb-4">
           <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
@@ -65,13 +87,41 @@
   </div>
 </div>
 
+<!-- Latest Courses Section -->
+<div class="py-16 bg-white">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between items-center mb-8">
+      <h2 class="text-3xl font-bold text-gray-900">Cursos Recientes</h2>
+      <a href="<%= courses_path %>" class="text-indigo-600 hover:text-indigo-800 font-medium">Ver todos →</a>
+    </div>
+    
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <% if @latest_courses.any? %>
+        <% @latest_courses.each do |course| %>
+          <%= render 'courses/course_card', course: course %>
+        <% end %>
+      <% else %>
+        <div class="col-span-3 text-center py-12">
+          <p class="text-gray-500 text-lg">No hay cursos recientes disponibles en este momento.</p>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>
+
 <!-- CTA Section -->
 <div class="bg-blue-700 py-16">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
     <h2 class="text-3xl font-bold text-white mb-4">¿Listo para comenzar tu viaje de aprendizaje?</h2>
     <p class="text-xl text-blue-100 mb-8">Únete a nuestra comunidad de estudiantes y comienza a aprender hoy mismo</p>
-    <a href="/signup" class="btn bg-white text-blue-700 hover:bg-blue-50 shadow-lg hover:shadow-xl">
-      Comenzar Ahora
-    </a>
+    <% if user_signed_in? %>
+      <a href="<%= courses_path %>" class="btn bg-white text-blue-700 hover:bg-blue-50 shadow-lg hover:shadow-xl px-6 py-3 rounded-lg font-semibold">
+        Explorar Cursos
+      </a>
+    <% else %>
+      <a href="<%= new_user_registration_path %>" class="btn bg-white text-blue-700 hover:bg-blue-50 shadow-lg hover:shadow-xl px-6 py-3 rounded-lg font-semibold">
+        Registrarse Ahora
+      </a>
+    <% end %>
   </div>
 </div>

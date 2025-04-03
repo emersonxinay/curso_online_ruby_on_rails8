@@ -1,0 +1,21 @@
+Tu Factura
+
+Hola <%= @user.name %>,
+
+Adjunto encontrarás la factura correspondiente a tu compra del curso "<%= @course.title %>".
+
+Detalles de la compra:
+- Curso: <%= @course.title %>
+- Fecha de compra: <%= @payment.created_at.strftime("%d/%m/%Y") %>
+- Monto: $<%= sprintf('%.2f', @payment.amount) %>
+- Método de pago: <%= @payment.payment_method.humanize %>
+- Número de factura: <%= @payment.id %>
+
+Puedes acceder al curso desde tu dashboard de estudiante.
+
+Para ir a tu dashboard, visita: <%= dashboard_student_url %>
+
+Si tienes alguna pregunta sobre tu factura o necesitas asistencia adicional, no dudes en contactarnos.
+
+© <%= Time.now.year %> Cursos en Línea. Todos los derechos reservados.
+Este correo electrónico y cualquier archivo adjunto son confidenciales y están destinados únicamente para el uso del destinatario.

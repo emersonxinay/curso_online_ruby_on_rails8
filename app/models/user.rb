@@ -7,7 +7,8 @@ class User < ApplicationRecord
   has_many :courses, dependent: :restrict_with_error
   has_many :enrollments, dependent: :destroy
   has_many :enrolled_courses, through: :enrollments, source: :course
-  has_many :completed_lessons
+  has_many :completed_lessons, dependent: :destroy
+  has_many :certificates, dependent: :destroy
   has_one_attached :avatar
 
   enum :role, { student: 0, instructor: 1, admin: 2 }

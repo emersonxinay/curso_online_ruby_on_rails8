@@ -1,0 +1,140 @@
+<div class="container mx-auto px-4 py-8">
+  <div class="flex flex-col lg:flex-row">
+    <!-- Barra lateral con lista de lecciones -->
+    <div class="w-full lg:w-1/4 pr-0 lg:pr-6 mb-6 lg:mb-0">
+      <div class="bg-white rounded-lg shadow-md p-4 sticky top-4">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-lg font-semibold">Contenido del curso</h3>
+          <%= link_to course_path(@course), class: "text-indigo-600 hover:text-indigo-800 text-sm" do %>
+            <i class="fas fa-arrow-left mr-1"></i> Volver al curso
+          <% end %>
+        </div>
+        
+        <div class="space-y-4">
+          <% @course.sections.each do |section| %>
+            <div>
+              <h4 class="font-medium text-gray-700 mb-2"><%= section.title %></h4>
+              <ul class="space-y-1 pl-2">
+                <% section.lessons.each do |lesson| %>
+                  <li>
+                    <%= link_to course_section_lesson_path(@course, section, lesson), 
+                        class: "flex items-center py-1 px-2 rounded-md #{lesson == @lesson ? 'bg-indigo-100 text-indigo-700' : 'hover:bg-gray-100'}" do %>
+                      <% if current_user.completed_lessons.exists?(lesson: lesson) %>
+                        <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                      <% elsif lesson.video.attached? %>
+                        <i class="fas fa-play-circle text-gray-400 mr-2"></i>
+                      <% else %>
+                        <i class="fas fa-file-alt text-gray-400 mr-2"></i>
+                      <% end %>
+                      <span class="<%= lesson == @lesson ? 'font-medium' : '' %>"><%= lesson.title %></span>
+                    <% end %>
+                  </li>
+                <% end %>
+              </ul>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Contenido principal de la lección -->
+    <div class="w-full lg:w-3/4">
+      <div class="bg-white rounded-lg shadow-md overflow-hidden">
+        <!-- Encabezado de la lección -->
+        <div class="p-6 border-b">
+          <div class="flex justify-between items-center">
+            <h1 class="text-2xl font-bold"><%= @lesson.title %></h1>
+            
+            <div class="flex space-x-4">
+              <% if current_user == @course.instructor || current_user&.admin? %>
+                <%= link_to edit_course_section_lesson_path(@course, @section, @lesson), 
+                    class: "text-blue-600 hover:text-blue-800" do %>
+                  <i class="fas fa-edit"></i> Editar
+                <% end %>
+              <% end %>
+              
+              <% unless current_user.completed_lessons.exists?(lesson: @lesson) %>
+                <%= button_to complete_course_section_lesson_path(@course, @section, @lesson), 
+                    method: :post, 
+                    class: "bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700" do %>
+                  <i class="fas fa-check mr-2"></i> Marcar como completada
+                <% end %>
+              <% else %>
+                <div class="bg-green-100 text-green-800 px-4 py-2 rounded-lg flex items-center">
+                  <i class="fas fa-check-circle mr-2"></i> Completada
+                </div>
+              <% end %>
+            </div>
+          </div>
+          
+          <div class="flex items-center text-sm text-gray-500 mt-2">
+            <span>Sección: <%= @section.title %></span>
+          </div>
+        </div>
+        
+        <!-- Video de la lección (si existe) -->
+        <% if @lesson.video.attached? %>
+          <div class="aspect-w-16 aspect-h-9 bg-black">
+            <video 
+              class="w-full h-full object-contain" 
+              controls 
+              poster="<%= @course.cover_image.attached? ? url_for(@course.cover_image) : '' %>"
+            >
+              <source src="<%= url_for(@lesson.video) %>" type="<%= @lesson.video.content_type %>">
+              Tu navegador no soporta el elemento de video.
+            </video>
+          </div>
+        <% end %>
+        
+        <!-- Contenido de la lección -->
+        <div class="p-6">
+          <div class="prose max-w-none">
+            <%= @lesson.content %>
+          </div>
+        </div>
+        
+        <!-- Navegación entre lecciones -->
+        <div class="p-6 border-t flex justify-between">
+          <% prev_lesson = @section.lessons.where("position < ?", @lesson.position).order(position: :desc).first %>
+          <% if prev_lesson %>
+            <%= link_to course_section_lesson_path(@course, @section, prev_lesson), 
+                class: "flex items-center text-indigo-600 hover:text-indigo-800" do %>
+              <i class="fas fa-arrow-left mr-2"></i> Lección anterior
+            <% end %>
+          <% else %>
+            <% prev_section = @course.sections.where("position < ?", @section.position).order(position: :desc).first %>
+            <% if prev_section && prev_section.lessons.any? %>
+              <%= link_to course_section_lesson_path(@course, prev_section, prev_section.lessons.order(position: :desc).first), 
+                  class: "flex items-center text-indigo-600 hover:text-indigo-800" do %>
+                <i class="fas fa-arrow-left mr-2"></i> Sección anterior
+              <% end %>
+            <% else %>
+              <div></div> <!-- Espacio vacío para mantener el flex justify-between -->
+            <% end %>
+          <% end %>
+          
+          <% next_lesson = @section.lessons.where("position > ?", @lesson.position).order(position: :asc).first %>
+          <% if next_lesson %>
+            <%= link_to course_section_lesson_path(@course, @section, next_lesson), 
+                class: "flex items-center text-indigo-600 hover:text-indigo-800" do %>
+              Siguiente lección <i class="fas fa-arrow-right ml-2"></i>
+            <% end %>
+          <% else %>
+            <% next_section = @course.sections.where("position > ?", @section.position).order(position: :asc).first %>
+            <% if next_section && next_section.lessons.any? %>
+              <%= link_to course_section_lesson_path(@course, next_section, next_section.lessons.order(position: :asc).first), 
+                  class: "flex items-center text-indigo-600 hover:text-indigo-800" do %>
+                Siguiente sección <i class="fas fa-arrow-right ml-2"></i>
+              <% end %>
+            <% else %>
+              <%= link_to course_path(@course), 
+                  class: "flex items-center text-green-600 hover:text-green-800" do %>
+                Finalizar curso <i class="fas fa-flag-checkered ml-2"></i>
+              <% end %>
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

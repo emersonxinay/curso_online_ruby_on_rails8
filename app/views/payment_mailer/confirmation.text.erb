@@ -1,0 +1,21 @@
+¡Pago confirmado!
+
+Hola <%= @user.name %>,
+
+Gracias por tu pago. Tu inscripción al curso "<%= @course.title %>" ha sido confirmada.
+
+Detalles del pago:
+- Monto: $<%= sprintf('%.2f', @payment.amount) %>
+- Fecha: <%= @payment.updated_at.strftime("%d/%m/%Y") %>
+- Método de pago: <%= @payment.payment_method.humanize %>
+- ID de transacción: <%= @payment.transaction_id %>
+
+Puedes acceder al curso inmediatamente desde tu dashboard de estudiante.
+
+Para ver tu dashboard, visita: <%= dashboard_student_url %>
+
+Hemos adjuntado tu factura a este correo electrónico.
+
+Si tienes alguna pregunta, no dudes en contactarnos.
+
+© <%= Time.now.year %> Cursos en Línea. Todos los derechos reservados.

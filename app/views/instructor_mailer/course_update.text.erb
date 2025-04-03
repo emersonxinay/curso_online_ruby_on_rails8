@@ -1,0 +1,17 @@
+Tu curso ha sido actualizado
+
+Hola <%= @instructor.name %>,
+
+Te informamos que tu curso <%= @course.title %> ha sido actualizado.
+
+Detalles del curso:
+- Título: <%= @course.title %>
+- Estado: <%= @course.status.humanize %>
+- Precio: $<%= sprintf('%.2f', @course.price) %>
+- Última actualización: <%= @course.updated_at.strftime("%d/%m/%Y %H:%M") %>
+
+Puedes revisar los cambios y gestionar tu curso desde tu dashboard de instructor.
+
+Para ver tu dashboard, visita: <%= dashboard_instructor_url %>
+
+© <%= Time.now.year %> Cursos en Línea. Todos los derechos reservados.

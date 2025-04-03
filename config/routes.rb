@@ -15,10 +15,22 @@ Rails.application.routes.draw do
       resources :payments, only: [:new, :create] do
         member do
           get :bank_transfer_instructions
+          get :paypal_success
+          get :paypal_cancel
         end
       end
     end
   end
+  
+  # Certificates routes
+  resources :certificates, only: [:index, :show] do
+    member do
+      get :download
+    end
+  end
+  
+  # Enrolled courses for current user
+  get 'my-courses', to: 'enrollments#index', as: :enrolled_courses
   
   # Payment webhooks
   post 'stripe/webhook', to: 'payments#stripe_webhook'
@@ -27,10 +39,28 @@ Rails.application.routes.draw do
   # Payment success/cancel routes
   get 'payments/:id/success', to: 'payments#success', as: :payment_success
   get 'payments/:id/cancel', to: 'payments#cancel', as: :payment_cancel
-  get 'payments/:id/paypal/success', to: 'payments#paypal_success', as: :paypal_success
-  get 'payments/:id/paypal/cancel', to: 'payments#paypal_cancel', as: :paypal_cancel
   
+  # Dashboard routes
   get 'dashboard/student', to: 'dashboard#student'
   get 'dashboard/instructor', to: 'dashboard#instructor'
   get 'dashboard/admin', to: 'dashboard#admin'
+  
+  # Static pages
+  get 'about', to: 'home#about'
+  get 'privacy', to: 'home#privacy'
+  get 'terms', to: 'home#terms'
+  get 'contact', to: 'home#contact'
+  
+  # Notifications
+  resources :notifications, only: [:index, :show, :update]
+  
+  # Admin routes
+  namespace :admin do
+    resources :users
+    resources :courses
+    resources :payments
+    resources :enrollments
+    resources :certificates
+    root to: 'dashboard#index'
+  end
 end

@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Certificado - <%= @certificate.course.title %></title>
+  <style>
+    body {
+      font-family: 'Helvetica', 'Arial', sans-serif;
+      color: #333;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+      background-color: #fff;
+    }
+    .certificate {
+      width: 100%;
+      padding: 40px;
+      box-sizing: border-box;
+      border: 20px solid #4338ca;
+      position: relative;
+      margin: 0 auto;
+    }
+    .certificate:after {
+      content: '';
+      position: absolute;
+      top: 0px;
+      left: 0px;
+      right: 0px;
+      bottom: 0px;
+      border: 2px solid #4338ca;
+    }
+    .header {
+      margin-bottom: 30px;
+    }
+    .title {
+      font-size: 36px;
+      font-weight: bold;
+      margin-bottom: 10px;
+      color: #4338ca;
+    }
+    .subtitle {
+      font-size: 18px;
+      margin-bottom: 30px;
+    }
+    .recipient {
+      font-size: 30px;
+      font-weight: bold;
+      margin-bottom: 5px;
+      color: #1f2937;
+    }
+    .course-title {
+      font-size: 24px;
+      font-weight: bold;
+      margin: 20px 0;
+      color: #4338ca;
+    }
+    .date {
+      font-size: 16px;
+      margin: 30px 0;
+    }
+    .signatures {
+      display: flex;
+      justify-content: space-around;
+      margin-top: 60px;
+    }
+    .signature {
+      width: 40%;
+    }
+    .signature-line {
+      width: 100%;
+      border-top: 1px solid #333;
+      margin-bottom: 5px;
+    }
+    .signature-name {
+      font-weight: bold;
+    }
+    .signature-title {
+      font-size: 14px;
+      color: #666;
+    }
+    .certificate-id {
+      font-size: 12px;
+      color: #666;
+      margin-top: 40px;
+    }
+    .logo {
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="certificate">
+    <div class="header">
+      <div class="logo">
+        <!-- Logo de la plataforma -->
+        <h1>CURSOS ONLINE</h1>
+      </div>
+      <div class="title">CERTIFICADO DE FINALIZACIÓN</div>
+      <div class="subtitle">Este certificado se otorga a</div>
+    </div>
+    
+    <div class="recipient"><%= @certificate.user.name %></div>
+    <div>por haber completado exitosamente el curso</div>
+    <div class="course-title"><%= @certificate.course.title %></div>
+    
+    <div class="date">
+      Emitido el <%= l @certificate.issued_at, format: :long %>
+    </div>
+    
+    <div class="signatures">
+      <div class="signature">
+        <div class="signature-line"></div>
+        <div class="signature-name"><%= @certificate.course.instructor.name %></div>
+        <div class="signature-title">Instructor</div>
+      </div>
+      
+      <div class="signature">
+        <div class="signature-line"></div>
+        <div class="signature-name">Cursos Online</div>
+        <div class="signature-title">Plataforma Educativa</div>
+      </div>
+    </div>
+    
+    <div class="certificate-id">
+      Certificado ID: <%= @certificate.id %>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,50 @@
+<div class="container mx-auto px-4 py-8">
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-2xl font-bold text-gray-800">Mis Certificados</h1>
+    <%= link_to enrolled_courses_path, class: "text-indigo-600 hover:text-indigo-800" do %>
+      <i class="fas fa-arrow-left mr-1"></i> Volver a mis cursos
+    <% end %>
+  </div>
+
+  <% if @certificates.any? %>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <% @certificates.each do |certificate| %>
+        <div class="bg-white rounded-lg shadow-md overflow-hidden">
+          <div class="p-6">
+            <% if certificate.course.cover_image.attached? %>
+              <%= image_tag certificate.course.cover_image, class: "w-full h-32 object-cover rounded mb-4" %>
+            <% else %>
+              <div class="w-full h-32 bg-gray-200 rounded mb-4 flex items-center justify-center">
+                <i class="fas fa-certificate text-gray-400 text-4xl"></i>
+              </div>
+            <% end %>
+            
+            <h3 class="text-lg font-semibold mb-2"><%= certificate.course.title %></h3>
+            <p class="text-sm text-gray-600 mb-4">Completado el <%= l certificate.issued_at.to_date, format: :long %></p>
+            
+            <div class="flex justify-between items-center">
+              <%= link_to certificate_path(certificate), class: "text-indigo-600 hover:text-indigo-800" do %>
+                <i class="fas fa-eye mr-1"></i> Ver
+              <% end %>
+              
+              <%= link_to download_certificate_path(certificate, format: :pdf), class: "text-green-600 hover:text-green-800" do %>
+                <i class="fas fa-download mr-1"></i> Descargar
+              <% end %>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="bg-white rounded-lg shadow-md p-8 text-center">
+      <div class="text-gray-400 mb-4">
+        <i class="fas fa-certificate text-6xl"></i>
+      </div>
+      <h3 class="text-xl font-medium text-gray-700 mb-2">Aún no tienes certificados</h3>
+      <p class="text-gray-600 mb-6">Completa alguno de nuestros cursos para obtener tu primer certificado.</p>
+      <%= link_to courses_path, class: "inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700" do %>
+        <i class="fas fa-search mr-2"></i> Explorar cursos
+      <% end %>
+    </div>
+  <% end %>
+</div>

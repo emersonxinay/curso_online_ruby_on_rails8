@@ -73,12 +73,17 @@ const initPayPal = () => {
   }
 };
 
-// Initialize payment methods when DOM is loaded
-document.addEventListener('turbo:load', () => {
+// Función para inicializar los métodos de pago
+const initializePaymentMethods = () => {
   if (document.querySelector('[data-payment-method="stripe"]')) {
     initStripe();
   }
   if (document.querySelector('[data-payment-method="paypal"]')) {
     initPayPal();
   }
-});
+};
+
+// Inicializar en diferentes eventos de Turbo para asegurar que funcione en todas las situaciones
+document.addEventListener('turbo:load', initializePaymentMethods);
+document.addEventListener('turbo:render', initializePaymentMethods);
+document.addEventListener('DOMContentLoaded', initializePaymentMethods);

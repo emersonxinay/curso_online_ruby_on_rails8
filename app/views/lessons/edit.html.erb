@@ -1,0 +1,14 @@
+<div class="container mx-auto px-4 py-8">
+  <div class="max-w-3xl mx-auto bg-white rounded-lg shadow-md p-6">
+    <div class="flex items-center justify-between mb-6">
+      <h1 class="text-2xl font-bold">Editar Lección</h1>
+      <div class="text-sm text-gray-500">
+        <span>Curso: <%= @course.title %></span>
+        <span class="mx-2">•</span>
+        <span>Sección: <%= @section.title %></span>
+      </div>
+    </div>
+
+    <%= render 'form' %>
+  </div>
+</div>

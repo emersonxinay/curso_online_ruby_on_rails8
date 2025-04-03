@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
+  <style>
+    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+    .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+    .header { text-align: center; margin-bottom: 20px; }
+    .content { background-color: #f9f9f9; padding: 20px; border-radius: 5px; }
+    .footer { text-align: center; margin-top: 20px; font-size: 12px; color: #777; }
+    .button { display: inline-block; background-color: #4F46E5; color: white; text-decoration: none; padding: 10px 20px; border-radius: 5px; }
+    .stats { margin: 20px 0; padding: 15px; background-color: #e9ecef; border-radius: 5px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>¡Nuevo estudiante inscrito!</h1>
+    </div>
+    
+    <div class="content">
+      <p>Hola <%= @instructor.name %>,</p>
+      
+      <p>Nos complace informarte que un nuevo estudiante se ha inscrito en tu curso <strong><%= @course.title %></strong>.</p>
+      
+      <div class="stats">
+        <p><strong>Detalles de la inscripción:</strong></p>
+        <ul>
+          <li>Estudiante: <%= @student.name %></li>
+          <li>Correo electrónico: <%= @student.email %></li>
+          <li>Fecha de inscripción: <%= @enrollment.created_at.strftime("%d/%m/%Y") %></li>
+          <li>Monto pagado: $<%= sprintf('%.2f', @payment.amount) %></li>
+        </ul>
+      </div>
+      
+      <p>Ya puedes ver a este estudiante en la lista de participantes de tu curso.</p>
+      
+      <p style="text-align: center; margin-top: 30px;">
+        <a href="<%= dashboard_instructor_url %>" class="button">Ver Dashboard</a>
+      </p>
+    </div>
+    
+    <div class="footer">
+      <p>© <%= Time.now.year %> Cursos en Línea. Todos los derechos reservados.</p>
+    </div>
+  </div>
+</body>
+</html>

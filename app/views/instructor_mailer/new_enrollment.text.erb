@@ -1,0 +1,17 @@
+¡Nuevo estudiante inscrito!
+
+Hola <%= @instructor.name %>,
+
+Nos complace informarte que un nuevo estudiante se ha inscrito en tu curso <%= @course.title %>.
+
+Detalles de la inscripción:
+- Estudiante: <%= @student.name %>
+- Correo electrónico: <%= @student.email %>
+- Fecha de inscripción: <%= @enrollment.created_at.strftime("%d/%m/%Y") %>
+- Monto pagado: $<%= sprintf('%.2f', @payment.amount) %>
+
+Ya puedes ver a este estudiante en la lista de participantes de tu curso.
+
+Para ver tu dashboard, visita: <%= dashboard_instructor_url %>
+
+© <%= Time.now.year %> Cursos en Línea. Todos los derechos reservados.
