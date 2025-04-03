@@ -18,7 +18,7 @@ gem "cssbundling-rails"
 gem "turbo-rails"
 gem "stimulus-rails"
 gem "jbuilder"
-gem "tailwindcss-rails", "~> 2.3"
+gem "tailwindcss-rails", "~> 4.2"
 
 # Database and caching
 gem "redis", ">= 4.0.1"
