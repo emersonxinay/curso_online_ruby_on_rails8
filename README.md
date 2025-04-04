@@ -100,8 +100,50 @@ User.create!(email: "admin@example.com", password: "password123", role: :admin)
 Ejecuta las pruebas con:
 
 ```sh
-rspec
+rails test
 ```
+
+## 📝 Tareas Pendientes
+
+### Integración de Pagos
+- Completar la integración con Stripe (webhooks y manejo de eventos)
+- Finalizar la integración con PayPal (webhooks y manejo de eventos)
+- Mejorar el proceso de aprobación de transferencias bancarias
+- Implementar sistema de reembolsos
+- Añadir reportes financieros para administradores
+
+### Gestión de Usuarios
+- Mejorar el sistema de usuarios pausados
+- Implementar sistema de notificaciones en tiempo real
+- Añadir opciones de recuperación de cuenta
+- Implementar verificación en dos pasos
+
+### Cursos y Contenido
+- Añadir soporte para contenido multimedia (videos, archivos)
+- Implementar sistema de progreso del estudiante
+- Añadir foros de discusión por curso
+- Implementar sistema de calificaciones y evaluaciones
+
+### Certificados
+- Mejorar el diseño de los certificados
+- Añadir sistema de verificación de certificados
+- Implementar compartir certificados en redes sociales
+
+### Interfaz de Usuario
+- Optimizar para dispositivos móviles
+- Mejorar la accesibilidad
+- Implementar modo oscuro
+- Añadir más opciones de personalización
+
+### Infraestructura
+- Configurar CDN para archivos estáticos
+- Implementar caché para mejorar rendimiento
+- Configurar monitoreo y alertas
+- Mejorar la seguridad general del sistema
+
+## 📄 Licencia
+
+Este proyecto está bajo la Licencia MIT - ver el archivo LICENSE para más detalles.
 
 
 

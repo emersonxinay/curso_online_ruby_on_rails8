@@ -43,16 +43,26 @@ class LessonsController < ApplicationController
   end
 
   def complete
-    # Crear o encontrar la entrada de lección completada
+    # Verificar si la lección es gratuita o si el usuario está inscrito
+    unless @lesson.is_free || current_user.enrollments.active.exists?(course: @course)
+      flash[:alert] = 'Debes estar inscrito en el curso para marcar esta lección como completada'
+      redirect_to course_path(@course) and return
+    end
+
+    # Intentar crear o encontrar la entrada de lección completada
     completed_lesson = current_user.completed_lessons.find_or_create_by(lesson: @lesson)
     
+    if completed_lesson.errors.any?
+      flash[:alert] = completed_lesson.errors.full_messages.join("<br>").html_safe
+      redirect_to course_section_lesson_path(@course, @section, @lesson) and return
+    end
+
     # Verificar si el curso está completado
-    course_completed = @course.lessons.count == current_user.completed_lessons.where(lesson_id: @course.lessons.pluck(:id)).count
+    course_completed = @course.lessons.count == current_user.completed_lessons.for_enrolled_user(current_user, @course).count
     
-    # Si el curso está completado, generar certificado
-    if course_completed && !current_user.certificates.exists?(course: @course)
-      Certificate.create(user: current_user, course: @course)
-      flash[:notice] = '¡Felicidades! Has completado el curso y obtenido tu certificado.'
+    # Si el curso está completado y el usuario tiene una inscripción activa
+    if course_completed && current_user.enrollments.active.find_by(course: @course)
+      flash[:notice] = '¡Felicidades! Has completado el curso.'
     else
       flash[:notice] = 'Lección marcada como completada.'
     end
@@ -124,7 +134,7 @@ class LessonsController < ApplicationController
     return true if @lesson.is_free || current_user.admin? || @course.instructor == current_user
     
     # Verificar si el usuario está inscrito
-    enrollment = current_user.enrollments.find_by(course: @course)
+    enrollment = current_user.enrollments.active.find_by(course: @course)
     
     if enrollment.nil?
       # Usuario no inscrito
@@ -134,14 +144,11 @@ class LessonsController < ApplicationController
     end
     
     # Verificar si la inscripción está activa (pago completado)
-    unless enrollment.active?
+    unless enrollment.status_active?
       # Inscripción pendiente o inactiva
       redirect_to course_path(@course), 
                   alert: 'Tu inscripción está pendiente de pago. Por favor, completa el proceso de pago para acceder al contenido del curso.'
       return
     end
-    
-    # Usuario inscrito con inscripción activa
-    true
   end
 end

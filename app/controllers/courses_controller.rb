@@ -8,8 +8,14 @@ class CoursesController < ApplicationController
   end
 
   def show
-    @sections = @course.sections.includes(:lessons)
-    @enrolled = current_user&.enrolled?(@course)
+    @enrolled = current_user && current_user.enrollments.active.exists?(course: @course)
+    @pending_enrollment = current_user && current_user.enrollments.find_by(course: @course, status: :pending)
+    @sections = @course.sections.includes(:lessons).order(position: :asc)
+    
+    # Si el curso está en borrador, solo el instructor o admin pueden verlo
+    if @course.draft? && current_user != @course.instructor && !current_user&.admin?
+      redirect_to courses_path, alert: 'Este curso aún no está disponible.'
+    end
   end
 
   def new

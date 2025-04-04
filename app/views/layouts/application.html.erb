@@ -19,6 +19,8 @@
 
   <!-- Scripts -->
   <%= javascript_include_tag "application", defer: true %>
+  <script src="https://js.stripe.com/v3/"></script>
+  <%= yield :head if content_for?(:head) %>
 
   <!-- PWA -->
   <link rel="manifest" href="/manifest.json">

@@ -11,8 +11,8 @@ class EnrollmentsController < ApplicationController
   end
 
   def create
-    # Verificar si el usuario ya está inscrito en el curso
-    if current_user.enrolled?(@course)
+    # Verificar si el usuario ya tiene una inscripción activa
+    if current_user.enrollments.where(course: @course, status: :active).exists?
       redirect_to course_path(@course), alert: 'Ya estás inscrito en este curso.'
       return
     end
@@ -23,8 +23,18 @@ class EnrollmentsController < ApplicationController
       return
     end
 
+    # Verificar si el usuario ya tiene una inscripción pendiente
+    pending_enrollment = current_user.enrollments.find_by(course: @course, status: :pending)
+    
+    if pending_enrollment
+      # Si ya existe una inscripción pendiente, redirigir al pago
+      redirect_to new_course_enrollment_payment_path(@course, pending_enrollment), 
+                  notice: 'Continúa con el proceso de pago para completar tu inscripción.'
+      return
+    end
+
     # Crear la inscripción con estado pendiente
-    @enrollment = current_user.enrollments.build(
+    @enrollment = current_user.enrollments.new(
       course: @course,
       price: @course.price,
       status: :pending
@@ -32,9 +42,11 @@ class EnrollmentsController < ApplicationController
 
     if @enrollment.save
       # Redirigir a la selección de método de pago
-      redirect_to new_course_enrollment_payment_path(@course, @enrollment)
+      redirect_to new_course_enrollment_payment_path(@course, @enrollment), 
+                  notice: 'Selecciona un método de pago para completar tu inscripción.'
     else
-      redirect_to course_path(@course), alert: 'Error al inscribirse en el curso.'
+      redirect_to course_path(@course), 
+                  alert: "Error al inscribirse en el curso: #{@enrollment.errors.full_messages.join(', ')}"
     end
   end
 
@@ -45,7 +57,7 @@ class EnrollmentsController < ApplicationController
   end
 
   def create_free_enrollment
-    @enrollment = current_user.enrollments.build(
+    @enrollment = current_user.enrollments.new(
       course: @course,
       price: 0,
       status: :active

@@ -202,6 +202,16 @@
               class: "w-full bg-indigo-600 text-white py-3 rounded-lg font-semibold hover:bg-indigo-700 text-center block mb-4" do %>
             <i class="fas fa-play-circle mr-2"></i> Continuar Aprendiendo
           <% end %>
+        <% elsif @pending_enrollment %>
+          <div class="bg-yellow-100 text-yellow-800 p-4 rounded mb-4 text-center">
+            <i class="fas fa-clock text-xl mr-2"></i> Inscripción pendiente
+          </div>
+          <p class="text-sm text-gray-600 mb-4">Tu inscripción está pendiente de pago. Por favor, completa el proceso de pago para acceder al curso.</p>
+          
+          <%= link_to new_course_enrollment_payment_path(@course, @pending_enrollment), 
+              class: "w-full bg-indigo-600 text-white py-3 rounded-lg font-semibold hover:bg-indigo-700 mb-4 text-center block" do %>
+            <i class="fas fa-credit-card mr-2"></i> Continuar con el pago
+          <% end %>
         <% elsif current_user != @course.instructor && @course.published? %>
           <%= button_to course_enrollments_path(@course), 
               class: "w-full bg-indigo-600 text-white py-3 rounded-lg font-semibold hover:bg-indigo-700 mb-4" do %>

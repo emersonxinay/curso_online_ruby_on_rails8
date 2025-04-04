@@ -1,0 +1,179 @@
+<div class="container mx-auto px-4 py-8">
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-3xl font-bold">Detalles del Pago #<%= @payment.id %></h1>
+    <%= link_to admin_payments_path, class: "text-indigo-600 hover:text-indigo-800 flex items-center" do %>
+      <i class="fas fa-arrow-left mr-2"></i> Volver a Pagos
+    <% end %>
+  </div>
+  
+  <% if notice.present? %>
+    <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6" role="alert">
+      <p><%= notice %></p>
+    </div>
+  <% end %>
+  
+  <% if alert.present? %>
+    <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6" role="alert">
+      <p><%= alert %></p>
+    </div>
+  <% end %>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <!-- Información principal del pago -->
+    <div class="md:col-span-2">
+      <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+        <h2 class="text-xl font-semibold mb-4">Información del Pago</h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <p class="text-sm text-gray-500">ID de Pago</p>
+            <p class="font-medium"><%= @payment.id %></p>
+          </div>
+          
+          <div>
+            <p class="text-sm text-gray-500">Estado</p>
+            <p>
+              <span class="<%= payment_status_badge_class(@payment.status) %>">
+                <%= @payment.status.humanize %>
+              </span>
+            </p>
+          </div>
+          
+          <div>
+            <p class="text-sm text-gray-500">Método de Pago</p>
+            <p>
+              <span class="<%= payment_method_badge_class(@payment.payment_method) %>">
+                <%= @payment.payment_method.humanize %>
+              </span>
+            </p>
+          </div>
+          
+          <div>
+            <p class="text-sm text-gray-500">Monto</p>
+            <p class="font-medium text-lg text-indigo-600"><%= number_to_currency(@payment.amount) %></p>
+          </div>
+          
+          <div>
+            <p class="text-sm text-gray-500">Fecha de Creación</p>
+            <p class="font-medium"><%= @payment.created_at.strftime("%d/%m/%Y %H:%M") %></p>
+          </div>
+          
+          <div>
+            <p class="text-sm text-gray-500">Fecha de Completado</p>
+            <p class="font-medium">
+              <%= @payment.completed_at ? @payment.completed_at.strftime("%d/%m/%Y %H:%M") : "Pendiente" %>
+            </p>
+          </div>
+          
+          <div>
+            <p class="text-sm text-gray-500">ID de Transacción</p>
+            <p class="font-medium font-mono text-sm">
+              <%= @payment.transaction_id.present? ? @payment.transaction_id : "No disponible" %>
+            </p>
+          </div>
+          
+          <div>
+            <p class="text-sm text-gray-500">Número de Factura</p>
+            <p class="font-medium">
+              <%= @payment.invoice_number.present? ? @payment.invoice_number : "No generada" %>
+            </p>
+          </div>
+        </div>
+        
+        <% if @payment.receipt.attached? %>
+          <div class="mt-6 pt-6 border-t">
+            <h3 class="text-lg font-medium mb-3">Comprobante de Pago</h3>
+            <div class="border rounded-lg overflow-hidden">
+              <% if @payment.receipt.content_type.include?('image') %>
+                <%= image_tag url_for(@payment.receipt), class: "w-full h-auto" %>
+              <% else %>
+                <div class="p-4 flex items-center justify-between bg-gray-50">
+                  <div class="flex items-center">
+                    <i class="far fa-file-pdf text-red-500 text-2xl mr-3"></i>
+                    <span>Comprobante PDF</span>
+                  </div>
+                  <%= link_to "Descargar", url_for(@payment.receipt), class: "text-indigo-600 hover:text-indigo-800", target: "_blank" %>
+                </div>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+        
+        <% if @payment.notes.present? %>
+          <div class="mt-6 pt-6 border-t">
+            <h3 class="text-lg font-medium mb-2">Notas del Usuario</h3>
+            <p class="text-gray-700"><%= @payment.notes %></p>
+          </div>
+        <% end %>
+      </div>
+      
+      <% if @payment.pending? && @payment.bank_transfer? %>
+        <div class="bg-white rounded-lg shadow-md p-6 flex justify-between items-center">
+          <div>
+            <h3 class="font-medium">Acciones de Administrador</h3>
+            <p class="text-sm text-gray-500">Verifica el comprobante y aprueba o rechaza este pago</p>
+          </div>
+          <div class="flex space-x-3">
+            <%= button_to "Aprobar Pago", approve_admin_payment_path(@payment), method: :patch, 
+                class: "bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2",
+                data: { confirm: "¿Estás seguro de aprobar este pago?" } %>
+            
+            <%= button_to "Rechazar Pago", reject_admin_payment_path(@payment), method: :patch, 
+                class: "bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2",
+                data: { confirm: "¿Estás seguro de rechazar este pago?" } %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+    
+    <!-- Información del usuario y curso -->
+    <div class="md:col-span-1">
+      <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+        <h2 class="text-xl font-semibold mb-4">Información del Usuario</h2>
+        <div class="space-y-3">
+          <div>
+            <p class="text-sm text-gray-500">Nombre</p>
+            <p class="font-medium"><%= @payment.user.name %></p>
+          </div>
+          <div>
+            <p class="text-sm text-gray-500">Email</p>
+            <p class="font-medium"><%= @payment.user.email %></p>
+          </div>
+          <div>
+            <p class="text-sm text-gray-500">ID de Usuario</p>
+            <p class="font-medium"><%= @payment.user.id %></p>
+          </div>
+          <div class="pt-3">
+            <%= link_to "Ver Usuario", admin_user_path(@payment.user), class: "text-indigo-600 hover:text-indigo-800" %>
+          </div>
+        </div>
+      </div>
+      
+      <div class="bg-white rounded-lg shadow-md p-6">
+        <h2 class="text-xl font-semibold mb-4">Información del Curso</h2>
+        <div class="space-y-3">
+          <div>
+            <p class="text-sm text-gray-500">Título</p>
+            <p class="font-medium"><%= @payment.enrollment.course.title %></p>
+          </div>
+          <div>
+            <p class="text-sm text-gray-500">Precio</p>
+            <p class="font-medium"><%= number_to_currency(@payment.enrollment.course.price) %></p>
+          </div>
+          <div>
+            <p class="text-sm text-gray-500">Estado de Inscripción</p>
+            <p class="font-medium">
+              <span class="<%= enrollment_status_badge_class(@payment.enrollment.status) %>">
+                <%= @payment.enrollment.status.humanize %>
+              </span>
+            </p>
+          </div>
+          <div class="pt-3">
+            <%= link_to "Ver Curso", admin_course_path(@payment.enrollment.course), class: "text-indigo-600 hover:text-indigo-800 block mb-2" %>
+            <%= link_to "Ver Inscripción", admin_enrollment_path(@payment.enrollment), class: "text-indigo-600 hover:text-indigo-800" %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,34 +1,33 @@
-<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-  <h1 style="color: #2563eb;">Payment Confirmation</h1>
-  
-  <p>Dear <%= @user.name %>,</p>
-  
-  <p>Thank you for your payment. Your enrollment in <strong><%= @course.title %></strong> has been confirmed.</p>
-  
-  <div style="background: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0;">
-    <h3 style="margin-top: 0;">Payment Details</h3>
-    <p><strong>Amount:</strong> $<%= @payment.amount %></p>
-    <p><strong>Date:</strong> <%= @payment.created_at.strftime("%B %d, %Y") %></p>
-    <p><strong>Transaction ID:</strong> <%= @payment.transaction_id %></p>
-    <p><strong>Payment Method:</strong> <%= @payment.payment_method.titleize %></p>
+<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;">
+  <div style="text-align: center; margin-bottom: 20px;">
+    <h1 style="color: #4f46e5;">Confirmación de Pago</h1>
   </div>
   
-  <p>You can start learning right away by visiting your course here:</p>
+  <p>Hola <%= @user.name %>,</p>
   
-  <p style="text-align: center;">
-    <%= link_to "Start Learning", course_url(@course), 
-        style: "display: inline-block; background: #2563eb; color: white; 
-                padding: 12px 24px; text-decoration: none; border-radius: 6px;" %>
-  </p>
+  <p>¡Gracias por tu pago! Tu inscripción al curso <strong><%= @course.title %></strong> ha sido confirmada.</p>
   
-  <p>We've attached your invoice to this email for your records.</p>
+  <div style="background-color: #f9fafb; padding: 15px; border-radius: 5px; margin: 20px 0;">
+    <h3 style="margin-top: 0;">Detalles del Pago:</h3>
+    <p><strong>Monto:</strong> <%= number_to_currency(@payment.amount) %></p>
+    <p><strong>Fecha:</strong> <%= @payment.created_at.strftime("%d/%m/%Y %H:%M") %></p>
+    <p><strong>ID de Transacción:</strong> <%= @payment.transaction_id %></p>
+    <p><strong>Método de Pago:</strong> <%= @payment.payment_method.humanize %></p>
+    <p><strong>Número de Factura:</strong> <%= @payment.invoice_number %></p>
+  </div>
   
-  <p>If you have any questions, please don't hesitate to contact our support team.</p>
+  <p>Puedes comenzar a aprender de inmediato visitando tu curso aquí:</p>
   
-  <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
-    <p style="color: #6b7280; font-size: 14px;">
-      Best regards,<br>
-      The Course Platform Team
-    </p>
+  <div style="text-align: center; margin-top: 30px;">
+    <a href="<%= course_url(@course) %>" style="background-color: #4f46e5; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">Comenzar a Aprender</a>
+  </div>
+  
+  <p>Hemos adjuntado tu factura a este correo para tus registros.</p>
+  
+  <p>Si tienes alguna pregunta, no dudes en contactar a nuestro equipo de soporte respondiendo a este correo o a través de <a href="mailto:soporte@cursoslinea.com" style="color: #4f46e5;">soporte@cursoslinea.com</a>.</p>
+  
+  <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0; text-align: center; color: #6b7280; font-size: 14px;">
+    <p>Este es un correo automático, por favor no respondas directamente a este mensaje.</p>
+    <p>&copy; <%= Date.current.year %> Cursos en Línea. Todos los derechos reservados.</p>
   </div>
 </div>

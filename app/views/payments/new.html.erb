@@ -1,43 +1,58 @@
 <div class="container mx-auto px-4 py-8">
   <div class="max-w-2xl mx-auto">
-    <h1 class="text-3xl font-bold mb-8">Choose Payment Method</h1>
+    <div class="flex justify-between items-center mb-6">
+      <h1 class="text-3xl font-bold">Seleccionar método de pago</h1>
+      <%= link_to course_path(@enrollment.course), class: "text-indigo-600 hover:text-indigo-800 flex items-center" do %>
+        <i class="fas fa-arrow-left mr-2"></i> Volver al curso
+      <% end %>
+    </div>
+    
+    <% content_for :head do %>
+      <meta name="stripe-key" content="<%= Rails.configuration.stripe[:publishable_key] %>">
+    <% end %>
 
     <div class="bg-white rounded-lg shadow p-6">
       <div class="mb-6">
-        <h2 class="text-xl font-semibold mb-2">Course Details</h2>
+        <h2 class="text-xl font-semibold mb-2">Detalles del curso</h2>
         <p class="text-gray-600"><%= @enrollment.course.title %></p>
         <p class="text-2xl font-bold text-indigo-600 mt-2">$<%= @enrollment.course.price %></p>
       </div>
 
-      <%= form_with(model: [@enrollment, @payment], local: true, class: "space-y-6") do |f| %>
+      <%= form_with(model: [@enrollment.course, @enrollment, @payment], local: true, class: "space-y-6", data: { payment_form: true }) do |f| %>
         <div class="space-y-4">
-          <div class="flex items-center space-x-3">
+          <div class="flex items-center space-x-3" data-payment-method="stripe">
             <%= f.radio_button :payment_method, :stripe, class: "h-4 w-4 text-indigo-600" %>
             <%= f.label :payment_method_stripe, class: "flex items-center" do %>
-              Credit Card
-              <%= image_tag "stripe.png", class: "h-8 ml-2" %>
+              Stripe
+              <i class="fab fa-cc-stripe text-blue-500 text-2xl ml-2"></i>
             <% end %>
           </div>
 
-          <div class="flex items-center space-x-3">
+          <div class="flex items-center space-x-3" data-payment-method="paypal">
             <%= f.radio_button :payment_method, :paypal, class: "h-4 w-4 text-indigo-600" %>
             <%= f.label :payment_method_paypal, class: "flex items-center" do %>
               PayPal
-              <%= image_tag "paypal.png", class: "h-8 ml-2" %>
+              <i class="fab fa-paypal text-blue-700 text-2xl ml-2"></i>
             <% end %>
           </div>
 
-          <div class="flex items-center space-x-3">
+          <div class="flex items-center space-x-3" data-payment-method="bank_transfer">
             <%= f.radio_button :payment_method, :bank_transfer, class: "h-4 w-4 text-indigo-600" %>
             <%= f.label :payment_method_bank_transfer, class: "flex items-center" do %>
               Bank Transfer
               <span class="text-sm text-gray-500 ml-2">(Manual verification required)</span>
             <% end %>
           </div>
+          
+          <!-- Contenedor para el elemento de tarjeta de Stripe -->
+          <div id="card-element-container" class="mt-4 p-3 border rounded-md bg-white" style="display: none;">
+            <div id="card-element"></div>
+            <div id="card-errors" class="text-red-500 text-sm mt-2"></div>
+          </div>
         </div>
 
         <div class="mt-8">
-          <%= f.submit "Continue to Payment", class: "w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2" %>
+          <%= f.submit "Continuar al Pago", id: "payment-submit-button", class: "w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2" %>
         </div>
       <% end %>
     </div>

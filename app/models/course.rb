@@ -19,20 +19,17 @@ class Course < ApplicationRecord
   scope :recent, -> { order(created_at: :desc) }
 
   def enrolled?(user)
-    enrollments.exists?(user: user)
+    enrollments.active.exists?(user: user)
   end
 
   def progress(user)
     return 0 unless enrolled?(user)
     
-    # Obtener los IDs de las lecciones de este curso
-    lesson_ids = Lesson.joins(:section).where(sections: { course_id: id }).pluck(:id)
-    
-    # Contar las lecciones completadas por el usuario
-    completed_lessons = user.completed_lessons.where(lesson_id: lesson_ids).count
+    # Obtener las lecciones completadas solo para inscritos activos
+    completed_lessons = user.completed_lessons.for_enrolled_user(user, self).count
     
     # Contar el total de lecciones
-    total_lessons = lesson_ids.size
+    total_lessons = lessons.count
     
     # Calcular el porcentaje
     total_lessons.zero? ? 0 : (completed_lessons.to_f / total_lessons * 100).round

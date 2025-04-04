@@ -1,0 +1,101 @@
+<div class="container mx-auto px-4 py-8">
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-3xl font-bold">Administración de Pagos</h1>
+    <%= link_to admin_dashboard_path, class: "text-indigo-600 hover:text-indigo-800 flex items-center" do %>
+      <i class="fas fa-arrow-left mr-2"></i> Volver al Dashboard
+    <% end %>
+  </div>
+
+  <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+    <h2 class="text-xl font-semibold mb-4">Filtros</h2>
+    <%= form_with url: admin_payments_path, method: :get, class: "flex flex-wrap gap-4" do |f| %>
+      <div class="w-full md:w-auto">
+        <%= f.label :payment_method, "Método de Pago", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= f.select :payment_method, 
+            Payment.payment_methods.keys.map { |method| [method.humanize, method] },
+            { include_blank: "Todos" },
+            class: "w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" %>
+      </div>
+      
+      <div class="w-full md:w-auto">
+        <%= f.label :status, "Estado", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= f.select :status, 
+            Payment.statuses.keys.map { |status| [status.humanize, status] },
+            { include_blank: "Todos" },
+            class: "w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" %>
+      </div>
+      
+      <div class="w-full md:w-auto flex items-end">
+        <%= f.submit "Filtrar", class: "bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2" %>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="bg-white rounded-lg shadow-md overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Usuario</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Curso</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Método</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Monto</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          <% @payments.each do |payment| %>
+            <tr>
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                <%= payment.id %>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <%= payment.user.email %>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <%= payment.enrollment.course.title %>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <span class="<%= payment_method_badge_class(payment.payment_method) %>">
+                  <%= payment.payment_method.humanize %>
+                </span>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <%= number_to_currency(payment.amount) %>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <span class="<%= payment_status_badge_class(payment.status) %>">
+                  <%= payment.status.humanize %>
+                </span>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <%= payment.created_at.strftime("%d/%m/%Y %H:%M") %>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                <%= link_to "Ver", admin_payment_path(payment), class: "text-indigo-600 hover:text-indigo-900 mr-3" %>
+                
+                <% if payment.pending? && payment.bank_transfer? %>
+                  <%= button_to "Aprobar", approve_admin_payment_path(payment), method: :patch, class: "text-green-600 hover:text-green-900 mr-3", data: { confirm: "¿Estás seguro de aprobar este pago?" } %>
+                  <%= button_to "Rechazar", reject_admin_payment_path(payment), method: :patch, class: "text-red-600 hover:text-red-900", data: { confirm: "¿Estás seguro de rechazar este pago?" } %>
+                <% end %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+    
+    <% if @payments.empty? %>
+      <div class="text-center py-8 text-gray-500">
+        No se encontraron pagos con los filtros seleccionados.
+      </div>
+    <% end %>
+    
+    <div class="px-6 py-4 bg-gray-50">
+      <%= paginate @payments %>
+    </div>
+  </div>
+</div>

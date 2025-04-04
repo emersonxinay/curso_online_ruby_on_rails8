@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_04_03_160325) do
+ActiveRecord::Schema[8.0].define(version: 2025_04_04_035619) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -93,7 +93,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_03_160325) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["course_id"], name: "index_enrollments_on_course_id"
-    t.index ["user_id", "course_id"], name: "index_enrollments_on_user_id_and_course_id", unique: true
+    t.index ["user_id", "course_id", "status"], name: "index_enrollments_on_user_id_and_course_id_and_status", unique: true
     t.index ["user_id"], name: "index_enrollments_on_user_id"
   end
 
@@ -119,6 +119,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_03_160325) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "invoice_number"
+    t.text "notes"
     t.index ["enrollment_id"], name: "index_payments_on_enrollment_id"
     t.index ["transaction_id"], name: "index_payments_on_transaction_id", unique: true
     t.index ["user_id"], name: "index_payments_on_user_id"

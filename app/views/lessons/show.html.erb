@@ -53,12 +53,22 @@
                 <% end %>
               <% end %>
               
-              <% if !current_user.completed_lessons.exists?(lesson: @lesson) %>
-                <%= button_to 'Marcar como completada', 
-                    mark_as_completed_lesson_path(@lesson),
-                    method: :post,
-                    class: "inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
-                %>
+              <% if current_user.enrollments.active.exists?(course: @course) %>
+                <% if !current_user.completed_lessons.exists?(lesson: @lesson) %>
+                  <%= button_to 'Marcar como completada', 
+                      complete_course_section_lesson_path(@course, @section, @lesson),
+                      method: :post,
+                      class: "inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
+                  %>
+                <% else %>
+                  <span class="inline-flex items-center px-4 py-2 bg-gray-200 text-gray-700 rounded-md">
+                    <i class="fas fa-check mr-1"></i> Completada
+                  </span>
+                <% end %>
+              <% else %>
+                <div class="text-gray-600 text-sm">
+                  Debes estar inscrito en el curso para marcar esta lección como completada
+                </div>
               <% end %>
             </div>
           </div>

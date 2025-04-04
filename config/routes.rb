@@ -21,6 +21,7 @@ Rails.application.routes.draw do
           get :bank_transfer_instructions
           get :paypal_success
           get :paypal_cancel
+          patch :upload_receipt
         end
       end
     end
@@ -62,7 +63,12 @@ Rails.application.routes.draw do
   namespace :admin do
     resources :users
     resources :courses
-    resources :payments
+    resources :payments do
+      member do
+        patch :approve
+        patch :reject
+      end
+    end
     resources :enrollments
     resources :certificates
     root to: 'dashboard#index'

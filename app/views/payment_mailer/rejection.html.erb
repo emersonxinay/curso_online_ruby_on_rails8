@@ -1,0 +1,37 @@
+<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;">
+  <div style="text-align: center; margin-bottom: 20px;">
+    <h1 style="color: #4f46e5;">Pago Rechazado</h1>
+  </div>
+  
+  <p>Hola <%= @payment.user.name %>,</p>
+  
+  <p>Lamentamos informarte que tu pago para el curso <strong><%= @payment.enrollment.course.title %></strong> ha sido rechazado.</p>
+  
+  <div style="background-color: #f9fafb; padding: 15px; border-radius: 5px; margin: 20px 0;">
+    <h3 style="margin-top: 0;">Detalles del Pago:</h3>
+    <p><strong>ID de Pago:</strong> <%= @payment.id %></p>
+    <p><strong>Monto:</strong> <%= number_to_currency(@payment.amount) %></p>
+    <p><strong>Método de Pago:</strong> <%= @payment.payment_method.humanize %></p>
+    <p><strong>Fecha:</strong> <%= @payment.created_at.strftime("%d/%m/%Y %H:%M") %></p>
+  </div>
+  
+  <p>Posibles razones para el rechazo:</p>
+  <ul>
+    <li>La información de la transferencia no coincide con nuestros registros</li>
+    <li>No se recibió el comprobante de pago</li>
+    <li>El monto transferido no coincide con el precio del curso</li>
+  </ul>
+  
+  <p>Si crees que esto es un error o necesitas ayuda, por favor contacta a nuestro equipo de soporte respondiendo a este correo o a través de <a href="mailto:soporte@cursoslinea.com" style="color: #4f46e5;">soporte@cursoslinea.com</a>.</p>
+  
+  <p>Puedes intentar realizar el pago nuevamente desde tu panel de estudiante.</p>
+  
+  <div style="text-align: center; margin-top: 30px;">
+    <a href="<%= dashboard_student_url %>" style="background-color: #4f46e5; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">Ir a Mi Panel</a>
+  </div>
+  
+  <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0; text-align: center; color: #6b7280; font-size: 14px;">
+    <p>Este es un correo automático, por favor no respondas directamente a este mensaje.</p>
+    <p>&copy; <%= Date.current.year %> Cursos en Línea. Todos los derechos reservados.</p>
+  </div>
+</div>
