@@ -9,9 +9,11 @@ class User < ApplicationRecord
   has_many :enrolled_courses, through: :enrollments, source: :course
   has_many :completed_lessons, dependent: :destroy
   has_many :certificates, dependent: :destroy
+  has_many :payments, dependent: :destroy
   has_one_attached :avatar
 
   enum :role, { student: 0, instructor: 1, admin: 2 }
+  enum :status, { active: 0, paused: 1 }
 
   validates :name, presence: true, length: { minimum: 2, maximum: 50 }
   validates :email, presence: true, uniqueness: true

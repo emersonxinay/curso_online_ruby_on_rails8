@@ -1,2 +1,118 @@
-<h1>Admin#Dashboard</h1>
-<p>Find me in app/views/admin/Dashboard.html.erb</p>
+<div class="container mx-auto px-4 py-8">
+  <h1 class="text-3xl font-bold mb-6">Panel de Administración</h1>
+  
+  <% pending_bank_transfers = Payment.where(status: :pending, payment_method: :bank_transfer).count %>
+  <% paused_users = User.where(status: :paused).count %>
+  
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <!-- Tarjeta de Pagos Pendientes -->
+    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+      <div class="bg-indigo-600 px-4 py-2">
+        <h2 class="text-white text-lg font-semibold">Pagos Pendientes</h2>
+      </div>
+      <div class="p-6">
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center">
+            <i class="fas fa-money-bill-wave text-indigo-500 text-2xl mr-3"></i>
+            <div>
+              <p class="text-gray-600">Transferencias bancarias por aprobar</p>
+              <p class="text-2xl font-bold"><%= pending_bank_transfers %></p>
+            </div>
+          </div>
+        </div>
+        <%= link_to admin_payments_path(status: 'pending', payment_method: 'bank_transfer'), class: "w-full bg-indigo-100 text-indigo-700 py-2 px-4 rounded-md hover:bg-indigo-200 flex items-center justify-center" do %>
+          <span>Ver pagos pendientes</span>
+          <i class="fas fa-arrow-right ml-2"></i>
+        <% end %>
+      </div>
+    </div>
+    
+    <!-- Tarjeta de Gestión de Usuarios -->
+    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+      <div class="bg-indigo-600 px-4 py-2">
+        <h2 class="text-white text-lg font-semibold">Gestión de Usuarios</h2>
+      </div>
+      <div class="p-6">
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center">
+            <i class="fas fa-users text-indigo-500 text-2xl mr-3"></i>
+            <div>
+              <p class="text-gray-600">Administrar usuarios</p>
+              <p class="text-2xl font-bold">Usuarios</p>
+            </div>
+          </div>
+        </div>
+        <%= link_to admin_users_path, class: "w-full bg-indigo-100 text-indigo-700 py-2 px-4 rounded-md hover:bg-indigo-200 flex items-center justify-center" do %>
+          <span>Gestionar usuarios</span>
+          <i class="fas fa-arrow-right ml-2"></i>
+        <% end %>
+      </div>
+    </div>
+    
+    <!-- Tarjeta de Todos los Pagos -->
+    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+      <div class="bg-indigo-600 px-4 py-2">
+        <h2 class="text-white text-lg font-semibold">Todos los Pagos</h2>
+      </div>
+      <div class="p-6">
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center">
+            <i class="fas fa-credit-card text-indigo-500 text-2xl mr-3"></i>
+            <div>
+              <p class="text-gray-600">Historial de pagos</p>
+              <p class="text-2xl font-bold">Pagos</p>
+            </div>
+          </div>
+        </div>
+        <%= link_to admin_payments_path, class: "w-full bg-indigo-100 text-indigo-700 py-2 px-4 rounded-md hover:bg-indigo-200 flex items-center justify-center" do %>
+          <span>Ver todos los pagos</span>
+          <i class="fas fa-arrow-right ml-2"></i>
+        <% end %>
+      </div>
+    </div>
+    
+    <!-- Tarjeta de Cursos -->
+    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+      <div class="bg-indigo-600 px-4 py-2">
+        <h2 class="text-white text-lg font-semibold">Cursos</h2>
+      </div>
+      <div class="p-6">
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center">
+            <i class="fas fa-book text-indigo-500 text-2xl mr-3"></i>
+            <div>
+              <p class="text-gray-600">Administrar cursos</p>
+              <p class="text-2xl font-bold">Cursos</p>
+            </div>
+          </div>
+        </div>
+        <%= link_to admin_courses_path, class: "w-full bg-indigo-100 text-indigo-700 py-2 px-4 rounded-md hover:bg-indigo-200 flex items-center justify-center" do %>
+          <span>Gestionar cursos</span>
+          <i class="fas fa-arrow-right ml-2"></i>
+        <% end %>
+      </div>
+    </div>
+    
+    <!-- Tarjeta de Usuarios Pausados -->
+    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+      <div class="bg-yellow-600 px-4 py-2">
+        <h2 class="text-white text-lg font-semibold">Usuarios Pausados</h2>
+      </div>
+      <div class="p-6">
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center">
+            <i class="fas fa-user-clock text-yellow-500 text-2xl mr-3"></i>
+            <div>
+              <p class="text-gray-600">Usuarios con acceso restringido</p>
+              <p class="text-2xl font-bold"><%= paused_users %></p>
+            </div>
+          </div>
+        </div>
+        <%= link_to admin_users_path(status: 'paused'), class: "w-full bg-yellow-100 text-yellow-700 py-2 px-4 rounded-md hover:bg-yellow-200 flex items-center justify-center" do %>
+          <span>Ver usuarios pausados</span>
+          <i class="fas fa-arrow-right ml-2"></i>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

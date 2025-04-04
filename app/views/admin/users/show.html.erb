@@ -1,0 +1,158 @@
+<div class="container mx-auto px-4 py-8">
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-3xl font-bold">Detalles del Usuario: <%= @user.name %></h1>
+    <%= link_to admin_users_path, class: "text-indigo-600 hover:text-indigo-800 flex items-center" do %>
+      <i class="fas fa-arrow-left mr-2"></i> Volver a Usuarios
+    <% end %>
+  </div>
+  
+  <% if notice.present? %>
+    <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6" role="alert">
+      <p><%= notice %></p>
+    </div>
+  <% end %>
+  
+  <% if alert.present? %>
+    <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6" role="alert">
+      <p><%= alert %></p>
+    </div>
+  <% end %>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <!-- Información principal del usuario -->
+    <div class="md:col-span-2">
+      <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+        <div class="flex justify-between items-start">
+          <h2 class="text-xl font-semibold mb-4">Información del Usuario</h2>
+          <div>
+            <span class="<%= user_role_badge_class(@user.role) %> mr-2">
+              <%= @user.role.humanize %>
+            </span>
+            <span class="<%= user_status_badge_class(@user.status) %>">
+              <%= @user.status.humanize %>
+            </span>
+          </div>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <p class="text-sm text-gray-500">ID de Usuario</p>
+            <p class="font-medium"><%= @user.id %></p>
+          </div>
+          
+          <div>
+            <p class="text-sm text-gray-500">Nombre</p>
+            <p class="font-medium"><%= @user.name %></p>
+          </div>
+          
+          <div>
+            <p class="text-sm text-gray-500">Email</p>
+            <p class="font-medium"><%= @user.email %></p>
+          </div>
+          
+          <div>
+            <p class="text-sm text-gray-500">Fecha de Registro</p>
+            <p class="font-medium"><%= @user.created_at.strftime("%d/%m/%Y %H:%M") %></p>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Acciones de administrador -->
+      <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+        <h3 class="font-medium mb-4">Acciones de Administrador</h3>
+        <div class="flex space-x-3">
+          <% if @user.active? %>
+            <%= button_to "Pausar Usuario", pause_admin_user_path(@user), method: :patch, 
+                class: "bg-yellow-600 text-white py-2 px-4 rounded-md hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2",
+                data: { confirm: "¿Estás seguro de pausar a este usuario? Esto restringirá su acceso a la plataforma." } %>
+          <% elsif @user.paused? %>
+            <%= button_to "Activar Usuario", activate_admin_user_path(@user), method: :patch, 
+                class: "bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2",
+                data: { confirm: "¿Estás seguro de activar a este usuario?" } %>
+          <% end %>
+        </div>
+      </div>
+      
+      <!-- Inscripciones del usuario -->
+      <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+        <h2 class="text-xl font-semibold mb-4">Inscripciones</h2>
+        
+        <% if @enrollments.any? %>
+          <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Curso</th>
+                  <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
+                  <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
+                  <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+                </tr>
+              </thead>
+              <tbody class="bg-white divide-y divide-gray-200">
+                <% @enrollments.each do |enrollment| %>
+                  <tr>
+                    <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
+                      <%= enrollment.course.title %>
+                    </td>
+                    <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
+                      <span class="<%= enrollment_status_badge_class(enrollment.status) %>">
+                        <%= enrollment.status.humanize %>
+                      </span>
+                    </td>
+                    <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
+                      <%= enrollment.created_at.strftime("%d/%m/%Y") %>
+                    </td>
+                    <td class="px-4 py-3 whitespace-nowrap text-sm font-medium">
+                      <%= link_to "Ver", admin_enrollment_path(enrollment), class: "text-indigo-600 hover:text-indigo-900" %>
+                    </td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+          </div>
+        <% else %>
+          <p class="text-gray-500 text-center py-4">Este usuario no tiene inscripciones.</p>
+        <% end %>
+      </div>
+    </div>
+    
+    <!-- Información de pagos -->
+    <div class="md:col-span-1">
+      <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+        <h2 class="text-xl font-semibold mb-4">Pagos Recientes</h2>
+        
+        <% if @payments.any? %>
+          <div class="space-y-4">
+            <% @payments.first(5).each do |payment| %>
+              <div class="border-b pb-3 last:border-b-0 last:pb-0">
+                <div class="flex justify-between items-start">
+                  <div>
+                    <p class="font-medium"><%= payment.enrollment.course.title %></p>
+                    <p class="text-sm text-gray-500"><%= payment.created_at.strftime("%d/%m/%Y") %></p>
+                  </div>
+                  <div>
+                    <p class="font-medium text-indigo-600"><%= number_to_currency(payment.amount) %></p>
+                    <span class="<%= payment_status_badge_class(payment.status) %> text-xs">
+                      <%= payment.status.humanize %>
+                    </span>
+                  </div>
+                </div>
+                <div class="mt-2">
+                  <%= link_to "Ver detalles", admin_payment_path(payment), class: "text-sm text-indigo-600 hover:text-indigo-800" %>
+                </div>
+              </div>
+            <% end %>
+          </div>
+          
+          <% if @payments.count > 5 %>
+            <div class="mt-4 text-center">
+              <p class="text-sm text-gray-500">Mostrando 5 de <%= @payments.count %> pagos</p>
+            </div>
+          <% end %>
+        <% else %>
+          <p class="text-gray-500 text-center py-4">Este usuario no tiene pagos registrados.</p>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
